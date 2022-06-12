@@ -1,5 +1,5 @@
 import { hierarchy, sum, range, path } from 'd3';
-import { sankey, sankeyJustify } from 'd3-sankey';
+import { sankeyTop, sankeyAlignCenter, sankeyBottom, sankeyRight } from 'jtfell-d3-sankey';
 
 const isObject = obj => typeof obj === 'object' && !Array.isArray(obj) && obj !== null;
 
@@ -42,79 +42,41 @@ export const genHierarchy = rawData => {
     !isObject(otherProps)
       ? undefined // leaves have no children
       : Object.entries(otherProps).map(([name, obj]) => ({ name, ...obj }));
+
   const absolutePath = d => `${d.parent ? absolutePath(d.parent) : ''}/${d.data.name}`;
+
   return (
     hierarchy({ name: 'root', ...rawData }, getChildren)
-      // convert each nodes's data into universal format: `{ name, path, groups: [{ key, value }, ...] }`
-      // so it does not depend on exact group names ('males', 'females')
-      // later it will allow to reuse the chart with other groups
       .each(d => {
-        const datum = {
-          name: d.data.name,
-          // `path` is needed to distinguish nodes with the same name but different ancestors
-          // (e.g. /root/bit501/bit601 vs /root/bit502/bit601)
-          path: absolutePath(d),
-          // groups: [] as any[]
-        };
-        if (d.data.compliancey || d.data.compliancen) {
-          datum.groups = [
-            {
-              key: 'compliancey',
-              value: sum(Object.values(d.data.compliancey || {})),
-            },
-            {
-              key: 'compliancen',
-              value: sum(Object.values(d.data.compliancen || {})),
-            }
-          ];
-        }
-        if (d.data.riskl || d.data.riskm || d.data.riskh) {
-          datum.groups = [
-            {
-              key: 'riskl',
-              value: d.data.riskl
-            },
-            {
-              key: 'riskm',
-              value: d.data.riskm
-            },
-            {
-              key: 'riskh',
-              value: d.data.riskh
-            }
-          ];
-        }
-        d.data = datum;
-        console.log(d.data);
+        d.data = { ...d.data, path: absolutePath(d) };
       })
   );
 };
 
 // Sankey layout is used to render the routes. It needs the intput data to be acyclic network
 export const genSankey = (width, height, margin, padding, hierarch, curve, data) => {
-  console.log({ width, height, margin, padding, hierarch, curve, data });
-  return sankey()
+  // const nWidth =  width - margin.left - margin.right;
+  // const nHeight = height - margin.top - margin.bottom;
+
+  return sankeyRight()
     .nodeId(d => d.name)
-    .nodeAlign(sankeyJustify)
+    .nodeAlign(sankeyAlignCenter)
     // the width of the node is the length of the horizontal segment of the route (between the curves)
-    .nodeWidth(((width - margin.left - margin.right) / (hierarch.height + 1)) * curve)
+    .nodeWidth((width / (hierarch.height + 1)) * curve)
     .nodePadding(padding)
-    .size([width - margin.left - margin.right, height - margin.top - margin.bottom])
+    .size([height, width])
     (data);
 };
 
 // Consider different groups of the same route as different targets
 // Such data structure format simplifies particle creation and tracking
 export const genTargetsAbs = (hierarchy) => {
-  return hierarchy.leaves().flatMap(t => {
-    console.log(t);
-    return (t.data.groups || []).map(g => ({
-      name: t.data.name,
-      path: t.data.path,
-      group: g.key,
-      value: g.value
-    }))
-  });
+  return hierarchy.leaves().map(l => ({
+    name: l.data.name,
+    path: l.data.path,
+    group: l.data.name,
+    value: l.parent.data[l.data.name],
+  }));
 };
 
 export const genTargets = targetsAbsolute => {
@@ -150,7 +112,7 @@ export const genLeaves = (sankey, targetsAbsolute) => {
 // Gets a list of the nodes from the root to a leaf and returns a path thru these nodes
 export const sankeyLinkCustom = (bandHeight, nodes) => {
   const p = path();
-  const h = bandHeight / 2;
+  const h = bandHeight // 2;
   nodes.forEach((n, i) => {
     if (i === 0) {
       p.moveTo(n.x0, n.y0 + h);

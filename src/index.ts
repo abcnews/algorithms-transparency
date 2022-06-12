@@ -1,20 +1,22 @@
 import acto from '@abcnews/alternating-case-to-object';
 import { whenOdysseyLoaded } from '@abcnews/env-utils';
 import { getMountValue, selectMounts } from '@abcnews/mount-utils';
-import type { Mount } from '@abcnews/mount-utils';
+import { loadScrollyteller } from 'jtfell-svelte-scrollyteller';
 import App from './components/App/App.svelte';
 
-let appMountEl: Mount;
+let appMountEl1;
+let appMountEl2;
 let appProps;
 
 whenOdysseyLoaded.then(() => {
-  [appMountEl] = selectMounts('algorithmstransparency');
+  const scrollyData = loadScrollyteller('first', 'u-full', 'mark');
+  appMountEl1 = scrollyData.mountNode;
 
-  if (appMountEl) {
-    appProps = acto(getMountValue(appMountEl));
+  if (appMountEl1) {
+    const mark = getMountValue(appMountEl1);
     new App({
-      target: appMountEl,
-      props: appProps
+      target: appMountEl1,
+      props: { scrollyData }
     });
   }
 });

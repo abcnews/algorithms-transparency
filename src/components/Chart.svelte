@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { scaleLinear, scaleBand, scaleOrdinal, scaleThreshold, sum } from "d3";
+  import { scaleLinear, scaleOrdinal, scaleThreshold, range } from "d3";
 
   import {
     genNodes,
@@ -10,77 +10,37 @@
     genTargets,
     genThresholds,
     genRoutes,
-    genLeaves,
+    // genLeaves,
     sankeyLinkCustom
   } from './data';
 
-  const margin = { top: 15, bottom: 25, left: 35, right: 35 };
+  const margin = { top: 25, bottom: 25, left: 5, right: 25 };
+  // const margin = { top: 5, bottom: 5, left: 5, right: 5 };
   const padding = 20;
   const curve = 0.6;
   const psize = 7;
-  const bandHeight = 60 - padding / 2;
-  const speed = 0.7;
-  const density = 7;
-  const MOBILE_BREAKPOINT = 480;
+  const speed = 0.2;
 
-  // Responsively sized dimensions (1:1 on mobile, 2:3 on desktop)
+  // const density = 7;
+
   export let width: number;
+  export let height: number;
+  export let totalParticles: number;
+  export let progressPercentage: number;
+  export let orientation: 'vertical' | 'horizontal';
+  export let input: any;
+  export let colours: Record<string, boolean>;
 
-  $: height = width > MOBILE_BREAKPOINT ? width * 2/3 : width;
+  let innerWidth: number;
+  let innerHeight: number;
+  let canvasTransform: string;
+
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
+  $: t = `translate( ${height / 2 - width / 2}, ${height / 2 - width / 2})`;
+  $: canvasTransform = orientation === 'vertical' ? `rotate(90) ${t}` : '';
 
-  const input = {
-    // nationa: {
-    //   compliancey: {
-    //     riskl: 0,
-    //     riskm: 0,
-    //     riskh: 20,
-    //   },
-    // },
-    nationb: {
-      compliancey: {
-        riskl: 3,
-        riskm: 5,
-        riskh: 10,
-      },
-      compliancen: {
-        riskl: 3,
-        riskm: 5,
-        riskh: 2,
-      },
-    },
-    nationc: {
-      compliancey: {
-        riskl: 18,
-        riskm: 2,
-        riskh: 0,
-      },
-      compliancen: {
-        riskl: 10,
-        riskm: 8,
-        riskh: 0,
-      },
-    },
-  };
-
-  // const input = {
-  //   nationa: {
-  //       riskl: 0,
-  //       riskm: 0,
-  //       riskh: 20,
-  //   },
-  //   nationb: {
-  //       riskl: 3,
-  //       riskm: 5,
-  //       riskh: 10,
-  //   },
-  //   nationc: {
-  //       riskl: 18,
-  //       riskm: 2,
-  //       riskh: 0,
-  //   },
-  // };
+  $: bandHeight = ((orientation === 'vertical' ? innerWidth : innerHeight) / 8) - padding / 2;
 
   $: nodes = genNodes(input);
   $: links = genLinks(input);
@@ -97,28 +57,12 @@
   $: targets = genTargets(targetsAbs);
   $: thresholds = genThresholds(targets);
   $: routes = genRoutes(sankey);
-  $: leaves = genLeaves(sankey, targetsAbs);
+  // $: leaves = genLeaves(sankey, targetsAbs);
 
-  // Can set to anything
-  $: totalParticles = sum(targetsAbs, t => t.value)
-
-  $: console.log({
-    nodes,
-    links,
-    hierarchy,
-    sankey,
-    targetsAbs,
-    targets,
-    thresholds,
-    routes,
-    leaves,
-    totalParticles,
-  });
 
   //
   // Scales
   //
-
   // takes a random number [0..1] and returns a target, based on distribution
   $: targetScale = scaleThreshold()
     .domain(thresholds)
@@ -134,65 +78,119 @@
     .range([-bandHeight / 2 - psize / 2, bandHeight / 2 - psize / 2])
 
   // takes a random number [0..1] and returns particle speed
-  $: speedScale = scaleLinear().range([speed, speed + 0.5])
+  $: speedScale = scaleLinear().range([1, 1 + speed])
 
-  $: yScale = scaleBand()
-    .domain(routes.map(r => r.target))
-    .range([innerHeight, 0])
-    .paddingInner(0.3)
+  let paths: SVGPathElement[] = [];
+  let cache = {};
+  $: {
+    console.log(innerWidth);
+    paths.forEach((path, i) => {
+      // Compute particle positions along the lines.
+      const length = path.getTotalLength();
+      const route = routes[i].map(r => `/${r.name}`).join('');
+      cache[route] = { points: range(100).map((x: number) => path.getPointAtLength(x * length / 100)) };
+    });
+  }
 
+  // Initial state of particles
+  $: particles = range(totalParticles).map(id => {
+    const target = targetScale(Math.random())
+    return {
+      id,
+      speed: speedScale(Math.random()),
+      colour: colorScale(target.group),
+      offset: offsetScale(Math.random()),
+      // current position on the route (will be updated in `chart.update`)
+      pos: 0,
+      // total length of the route, used to determine that the particle has arrived
+      length,
+      // target where the particle is moving
+      target,
+    };
+  });
 
-  // // Compute particle positions along the lines.
-  // // This technic relies on path.getPointAtLength function that returns coordinates of a point on the path
-  // // Another example of this technic:
-  // // https://observablehq.com/@oluckyman/point-on-a-path-detection
-  // //
-  // $: link.each(function(d) {
-  //   const path = this
-  //   const length = path.getTotalLength()
-  //   const points = d3.range(length).map(l => {
-  //     const point = path.getPointAtLength(l)
-  //     return { x: point.x, y: point.y }
-  //   })
-  //   const key = `${d.source}_${d.target}`
-  //   cache[key] = { points }
-  // })
+  // Update particles based on "progressPercentage"
+  $: {
+    particles = particles.map(d => {
+      const path = cache[d.target.path];
+      if (!path) {
+        return d;
+      }
+
+      // every particle appears at its own time, so adjust the global time `t` to local time
+      d.pos = (progressPercentage * path.points.length / 100) * d.speed;
+      // extract the current and the next point coordinates from the precomputed cache
+      const index = Math.floor(d.pos)
+      const coo = path.points[index]
+      const nextCoo = path.points[index + 1]
+
+      if (!coo || !nextCoo) {
+        return d;
+      }
+      const delta = d.pos - index // try to set it to 0 to see how jerky the animation is
+      const x = coo.x + (nextCoo.x - coo.x) * delta
+      const y = coo.y + (nextCoo.y - coo.y) * delta + d.offset;
+
+      return {
+        ...d,
+        x,
+        y,
+      };
+    });
+  }
 
 </script>
 
-<main class="graphic">
-
-  <svg {width} {height}>
-    <g transform={`translate(${margin.left},${margin.top})`}>
-      
-      <g class="routes">
-        {#each routes as route}
-          <path
-            d={sankeyLinkCustom(bandHeight, route)} 
-            stroke-width={bandHeight}
-          />
-        {/each}
-      </g>
-
+<g class="wrapper" transform={canvasTransform}>
+  <g 
+    class="inner"
+     width={innerWidth}
+     height={innerHeight}
+     transform={`translate(${margin.left},${margin.top})`}
+   >
+    <g class="routes">
+      {#each routes as route, i}
+        <path
+          d={sankeyLinkCustom(bandHeight, route)} 
+          stroke-width={bandHeight}
+          bind:this={paths[i]}
+        />
+      {/each}
     </g>
-  </svg>
 
-</main>
+    <g class="particles">
+      {#each particles as particle}
+        <rect
+          class="particle"
+          opacity="0.8"
+          fill={colours[particle.target.name] ? particle.colour : 'black'}
+          width={psize}
+          height={psize}
+          x={particle.x}
+          y={particle.y}
+        />
+      {/each}
+    </g>
+  </g>
+</g>
 
 
 <style>
-  .graphic {
-    position: relative;
-    max-height: 90vh;
+  .wrapper {
+    transform-box: fill-box;
+    transform-origin: center;
   }
 
-  .graphic > svg {
-    margin-top: 0.75rem;
+  .particles {
+    transition-property: x,y;
+    transition-duration: 0.2s;
+    width: 100%;
+    height: 100%;
   }
 
   .routes {
     fill: none;
-    stroke-opacity: 0.3;
-    stroke: rgb(45 36 36);
+    stroke-opacity: 0.1;
+    stroke: rgb(238, 238, 238);
   }
 </style>
