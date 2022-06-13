@@ -14,7 +14,7 @@
     sankeyLinkCustom
   } from './data';
 
-  const margin = { top: 25, bottom: 25, left: 5, right: 25 };
+  const margin = { top: 25, bottom: 25, left: 25, right: 25 };
   // const margin = { top: 5, bottom: 5, left: 5, right: 5 };
   const padding = 20;
   const curve = 0.6;
@@ -30,6 +30,7 @@
   export let orientation: 'vertical' | 'horizontal';
   export let input: any;
   export let colours: Record<string, boolean>;
+  export let showNationLabels: boolean;
 
   let innerWidth: number;
   let innerHeight: number;
@@ -52,13 +53,19 @@
   };
 
   $: hierarchy = genHierarchy(input);
-  $: sankey = genSankey(innerWidth, innerHeight, margin, padding, hierarchy, curve, dataForSankey);
+  let sankey;
+  $: {
+    if (orientation === 'horizontal') {
+      sankey = genSankey(innerHeight, innerWidth, margin, padding, hierarchy, curve, dataForSankey);
+    } else {
+      sankey = genSankey(innerWidth, innerHeight, margin, padding, hierarchy, curve, dataForSankey);
+    }
+  }
   $: targetsAbs = genTargetsAbs(hierarchy);
   $: targets = genTargets(targetsAbs);
   $: thresholds = genThresholds(targets);
   $: routes = genRoutes(sankey);
   // $: leaves = genLeaves(sankey, targetsAbs);
-
 
   //
   // Scales
@@ -70,7 +77,7 @@
 
   // takes a group type and returns a color
   $: colorScale = scaleOrdinal()
-    .domain(['riskl', 'riskm', 'riskh'])
+    .domain(['Low Risk', 'Med Risk', 'High Risk'])
     .range(['green', 'orange', 'red'])
 
   // takes a random number [0..1] and returns vertical position on the band
@@ -171,8 +178,25 @@
         />
       {/each}
     </g>
+
   </g>
 </g>
+
+    <g class="node-labels"
+     transform={`translate(${margin.left},${margin.top})`}
+       >
+      {#each sankey.nodes as node}
+        {#if node.name !== 'root' && node.name.indexOf('Compliant') === -1}
+          {#if (showNationLabels && node.name.indexOf('Nation') > -1) || node.name.indexOf('Nation') === -1} 
+            <text
+              transform={`translate(${node.x1 - bandHeight / 2}, ${node.y0 + bandHeight})`}
+              dominant-baseline="middle"
+              text-anchor="middle"
+              >{node.name}</text>
+          {/if}
+        {/if}
+      {/each}
+    </g>
 
 
 <style>
@@ -190,7 +214,20 @@
 
   .routes {
     fill: none;
-    stroke-opacity: 0.1;
+    stroke-opacity: 0.3;
     stroke: rgb(238, 238, 238);
+  }
+
+  .node-labels {
+    font-family: ABCSans, Helvetica, sans-serif;
+    font-weight: 700;
+    /* text-shadow: -1.25px -1.25px 0 #fff, */
+    /*               0      -1.25px 0 #fff, */
+    /*               1.25px -1.25px 0 #fff, */
+    /*               1.25px     0   0 #fff, */
+    /*               1.25px  1.25px 0 #fff, */
+    /*               0       1.25px 0 #fff, */
+    /*               -1.25px 1.25px 0 #fff, */
+    /*               -1.25px    0   0 #fff; */
   }
 </style>

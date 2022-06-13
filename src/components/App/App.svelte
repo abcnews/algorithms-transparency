@@ -8,14 +8,11 @@
   const MOBILE_BREAKPOINT = 480;
   let width: number;
   let height: number;
-  // $: height = width;
-  // Responsively sized dimensions (1.5:1 on mobile, 1.5:1 on desktop)
-  // $: height = width > MOBILE_BREAKPOINT ? 1.2 * width : 1.5 * width;
+  // Responsively sized dimensions (1.2:1 on mobile, 1:1 on desktop)
   $: {
     if (width < MOBILE_BREAKPOINT && height) {
       height = width * 1.2;
-    }
-    if (width < MOBILE_BREAKPOINT && orientation === 'horizontal') {
+    } else {
       height = width * 1;
     }
   }
@@ -24,10 +21,11 @@
   let progressPercentage = 0;
   let totalParticles = 10;
   let showSankey = false;
+  let showNationLabels = false;
   let colours = {
-    riskl: false,
-    riskm: false,
-    riskh: false,
+    "Low Risk": false,
+    "Med Risk": false,
+    "High Risk": false,
   };
 
   let updateProgress = ((progress: any) => {
@@ -45,30 +43,33 @@
 
     if (state.sankey === 'one') {
       showSankey = true;
+      showNationLabels = false;
       colours = {
-        riskl: false,
-        riskm: false,
-        riskh: false,
+        "Low Risk": false,
+        "Med Risk": false,
+        "High Risk": false,
       };
       totalParticles = 50;
       return;
     }
     if (state.sankey === 'two') {
       showSankey = true;
+      showNationLabels = false;
       colours = {
-        riskl: true,
-        riskm: true,
-        riskh: true,
+        "Low Risk": true,
+        "Med Risk": true,
+        "High Risk": true,
       };
       totalParticles = 50;
       return;
     }
     if (state.sankey === 'three') {
       showSankey = true;
+      showNationLabels = true;
       colours = {
-        riskl: false,
-        riskm: false,
-        riskh: true,
+        "Low Risk": false,
+        "Med Risk": false,
+        "High Risk": true,
       };
       totalParticles = 50;
       return;
@@ -77,28 +78,28 @@
   });
 
   const input = {
-    nationB: {
-      complianceN: {
-        riskl: 10,
-        riskm: 8,
-        riskh: 0,
+    "Nation A": {
+      "Compliant": {
+        "Low Risk": 11,
+        "Med Risk": 2,
+        "High Risk": 0,
       },
-      complianceY: {
-        riskl: 18,
-        riskm: 2,
-        riskh: 0,
+      "Non-Compliant": {
+        "Low Risk": 10,
+        "Med Risk": 6,
+        "High Risk": 0,
       },
     },
-    nationA: {
-      complianceN: {
-        riskl: 3,
-        riskm: 5,
-        riskh: 2,
-      },
-      complianceY: {
-        riskl: 3,
-        riskm: 5,
-        riskh: 10,
+    "Nation B": {
+      // "Compliant": {
+      //   "Low Risk": 5,
+      //   "Med Risk": 5,
+      //   "High Risk": 0,
+      // },
+      "Non-Compliant": {
+        "Low Risk": 0,
+        "Med Risk": 0,
+        "High Risk": 10,
       },
     },
   };
@@ -114,7 +115,7 @@
     <div bind:clientWidth={width} bind:clientHeight={height} class="wrapper">
       {#if width > 0 && height > 0 && showSankey}
         <svg width={width} height={height} viewBox="0 0 {width} {height}">
-          <Chart {colours} {progressPercentage} {totalParticles} {orientation} {width} {height} {input} />
+          <Chart {showNationLabels} {colours} {progressPercentage} {totalParticles} {orientation} {width} {height} {input} />
         </svg>
       {/if}
     </div>
