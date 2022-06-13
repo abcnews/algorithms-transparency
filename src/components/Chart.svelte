@@ -19,7 +19,7 @@
   const padding = 20;
   const curve = 0.6;
   const psize = 7;
-  const speed = 0.2;
+  const speed = 1;
 
   // const density = 7;
 
@@ -30,7 +30,7 @@
   export let orientation: 'vertical' | 'horizontal';
   export let input: any;
   export let colours: Record<string, boolean>;
-  export let showNationLabels: boolean;
+  export let showLabels: boolean;
 
   let innerWidth: number;
   let innerHeight: number;
@@ -76,9 +76,12 @@
     .range(targets)
 
   // takes a group type and returns a color
-  $: colorScale = scaleOrdinal()
+  $: riskColourScale = scaleOrdinal()
     .domain(['Low Risk', 'Med Risk', 'High Risk'])
     .range(['green', 'orange', 'red'])
+  $: nationColourScale = scaleOrdinal()
+    .domain(['A', 'B'])
+    .range(['purple', 'red'])
 
   // takes a random number [0..1] and returns vertical position on the band
   $: offsetScale = scaleLinear()
@@ -102,10 +105,12 @@
   // Initial state of particles
   $: particles = range(totalParticles).map(id => {
     const target = targetScale(Math.random())
+    const nation = target.path.indexOf('Nation A') > -1 ? 'A' : 'B';
     return {
       id,
       speed: speedScale(Math.random()),
-      colour: colorScale(target.group),
+      nationColour: nationColourScale(nation),
+      riskColour: riskColourScale(target.group),
       offset: offsetScale(Math.random()),
       // current position on the route (will be updated in `chart.update`)
       pos: 0,
@@ -170,7 +175,7 @@
         <rect
           class="particle"
           opacity="0.8"
-          fill={colours[particle.target.name] ? particle.colour : 'black'}
+          fill={colours[particle.target.name] ? particle.riskColour : 'black'}
           width={psize}
           height={psize}
           x={particle.x}
@@ -182,21 +187,23 @@
   </g>
 </g>
 
+  {#if showLabels}
     <g class="node-labels"
      transform={`translate(${margin.left},${margin.top})`}
        >
       {#each sankey.nodes as node}
         {#if node.name !== 'root' && node.name.indexOf('Compliant') === -1}
-          {#if (showNationLabels && node.name.indexOf('Nation') > -1) || node.name.indexOf('Nation') === -1} 
-            <text
-              transform={`translate(${node.x1 - bandHeight / 2}, ${node.y0 + bandHeight})`}
-              dominant-baseline="middle"
-              text-anchor="middle"
-              >{node.name}</text>
-          {/if}
+          <text
+            transform={`translate(${node.x1 - bandHeight / 2}, ${node.y0 + bandHeight})`}
+            dominant-baseline="middle"
+            text-anchor="middle"
+            stroke={node.name.indexOf('Risk') > -1 ? riskColourScale(node.name) : 'black'}
+            fill={node.name.indexOf('Risk') > -1 ? riskColourScale(node.name) : 'black'}
+            >{node.name}</text>
         {/if}
       {/each}
     </g>
+  {/if}
 
 
 <style>

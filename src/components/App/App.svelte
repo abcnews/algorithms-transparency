@@ -21,7 +21,7 @@
   let progressPercentage = 0;
   let totalParticles = 10;
   let showSankey = false;
-  let showNationLabels = false;
+  let showLabels = false;
   let colours = {
     "Low Risk": false,
     "Med Risk": false,
@@ -43,7 +43,7 @@
 
     if (state.sankey === 'one') {
       showSankey = true;
-      showNationLabels = false;
+      showLabels = false;
       colours = {
         "Low Risk": false,
         "Med Risk": false,
@@ -54,7 +54,7 @@
     }
     if (state.sankey === 'two') {
       showSankey = true;
-      showNationLabels = false;
+      showLabels = true;
       colours = {
         "Low Risk": true,
         "Med Risk": true,
@@ -65,7 +65,7 @@
     }
     if (state.sankey === 'three') {
       showSankey = true;
-      showNationLabels = true;
+      showLabels = true;
       colours = {
         "Low Risk": false,
         "Med Risk": false,
@@ -82,25 +82,35 @@
       "Compliant": {
         "Low Risk": 11,
         "Med Risk": 2,
-        "High Risk": 0,
+        // "High Risk": 0,
       },
       "Non-Compliant": {
-        "Low Risk": 10,
+        // "Low Risk": 2,
         "Med Risk": 6,
-        "High Risk": 0,
+        "High Risk": 2,
       },
     },
+    // "Nation B": {
+    //   "Compliant": {
+    //     "Low Risk": 5,
+    //     "Med Risk": 5,
+    //     "High Risk": 0,
+    //   },
+    //   "Non-Compliant": {
+    //     "Low Risk": 0,
+    //     "Med Risk": 0,
+    //     "High Risk": 10,
+    //   },
+    // },
     "Nation B": {
       // "Compliant": {
       //   "Low Risk": 5,
       //   "Med Risk": 5,
       //   "High Risk": 0,
       // },
-      "Non-Compliant": {
-        "Low Risk": 0,
-        "Med Risk": 0,
+        // "Low Risk": 0,
+        // "Med Risk": 0,
         "High Risk": 10,
-      },
     },
   };
 
@@ -115,7 +125,7 @@
     <div bind:clientWidth={width} bind:clientHeight={height} class="wrapper">
       {#if width > 0 && height > 0 && showSankey}
         <svg width={width} height={height} viewBox="0 0 {width} {height}">
-          <Chart {showNationLabels} {colours} {progressPercentage} {totalParticles} {orientation} {width} {height} {input} />
+          <Chart {showLabels} {colours} {progressPercentage} {totalParticles} {orientation} {width} {height} {input} />
         </svg>
       {/if}
     </div>
