@@ -19,7 +19,7 @@
   const padding = 20;
   const curve = 0.6;
   const psize = 7;
-  const speed = 1;
+  const speed = 2;
 
   // const density = 7;
 
@@ -125,28 +125,27 @@
   $: {
     particles = particles.map(d => {
       const path = cache[d.target.path];
-      if (!path) {
+      if (!path || isNaN(progressPercentage)) {
         return d;
       }
 
       // every particle appears at its own time, so adjust the global time `t` to local time
-      d.pos = (progressPercentage * path.points.length / 100) * d.speed;
+      d.pos = Math.floor(progressPercentage * d.speed);
       // extract the current and the next point coordinates from the precomputed cache
-      const index = Math.floor(d.pos)
-      const coo = path.points[index]
-      const nextCoo = path.points[index + 1]
-
-      if (!coo || !nextCoo) {
-        return d;
+      let coo = path.points[d.pos]
+      if (!coo) {
+        // coo = path.points[99];
+        return {
+          ...d,
+          x: null,
+          y: null,
+        };
       }
-      const delta = d.pos - index // try to set it to 0 to see how jerky the animation is
-      const x = coo.x + (nextCoo.x - coo.x) * delta
-      const y = coo.y + (nextCoo.y - coo.y) * delta + d.offset;
 
       return {
         ...d,
-        x,
-        y,
+        x: coo.x,
+        y: coo.y + d.offset,
       };
     });
   }
@@ -172,15 +171,17 @@
 
     <g class="particles">
       {#each particles as particle}
-        <rect
-          class="particle"
-          opacity="0.8"
-          fill={colours[particle.target.name] ? particle.riskColour : 'black'}
-          width={psize}
-          height={psize}
-          x={particle.x}
-          y={particle.y}
-        />
+        {#if particle.x && particle.y}
+          <rect
+            class="particle"
+            opacity="0.8"
+            fill={colours[particle.target.name] ? particle.riskColour : 'black'}
+            width={psize}
+            height={psize}
+            x={particle.x}
+            y={particle.y}
+          />
+        {/if}
       {/each}
     </g>
 
@@ -214,7 +215,7 @@
 
   .particles {
     transition-property: x,y;
-    transition-duration: 0.2s;
+    transition-duration: 2s;
     width: 100%;
     height: 100%;
   }
