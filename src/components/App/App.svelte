@@ -185,8 +185,8 @@
   .wrapper {
     margin-top: 0.75rem;
     padding: 1rem;
-    max-width: 40rem;
     height: 100%;
+    /* max-width: 60rem; */
   }
 
   :global(.panel-text-highlight) {
@@ -199,6 +199,20 @@
     font-weight: normal;
     line-height: 1.25;
     white-space: nowrap;
+  }
+
+  @media (min-width: 76rem) {
+    .wrapper {
+      padding: 7.5vw 0 0;
+      margin-left: 5vw !important;
+      width: 50vw;
+    }
+
+    :global(.scrollyteller .st-panel),
+    :global(.scrollyteller .panel) {
+      margin-left: 55vw !important;
+      max-width: 40vw !important;
+    }
   }
 
 </style>
