@@ -203,7 +203,6 @@
 
   @media (min-width: 76rem) {
     .wrapper {
-      padding: 7.5vw 0 0;
       margin-left: 5vw !important;
       width: 50vw;
     }
