@@ -5,7 +5,63 @@
   import { subscribe } from '@abcnews/progress-utils';
 
   export let scrollyData: any;
-  const orientation = 'horizontal';
+
+  const results = [
+    {
+      nation: {
+        name: 'Australia',
+        colour: 'green',
+        numberOfApplicants: 100,
+        dist: {
+          low: 0.6,
+          med: 0.2,
+          high: 0.2,
+        }
+      },
+      rejectionRate: 0.12,
+      outcome: {
+        low: {
+          approved: 75,
+          rejected: 5,
+        },
+        med: {
+          approved: 10,
+          rejected: 20,
+        },
+        high: {
+          approved: 2,
+          rejected: 1,
+        },
+      },
+    },
+    {
+      nation: {
+        name: 'India',
+        colour: 'blue',
+        numberOfApplicants: 100,
+        dist: {
+          low: 0.2,
+          med: 0.2,
+          high: 0.6,
+        }
+      },
+      rejectionRate: 0.22,
+      outcome: {
+        low: {
+          approved: 15,
+          rejected: 10,
+        },
+        med: {
+          approved: 60,
+          rejected: 20,
+        },
+        high: {
+          approved: 40,
+          rejected: 40,
+        },
+      },
+    },
+  ];
 
   const MOBILE_BREAKPOINT = 480;
   let width: number;
@@ -13,22 +69,13 @@
   // Responsively sized dimensions (1.2:1 on mobile, 1:1 on desktop)
   $: {
     if (width < MOBILE_BREAKPOINT && height) {
-      height = width * 1.2;
+      height = width * 0.7;
     } else {
-      height = width * 1;
+      height = width * 0.7;
     }
   }
 
-
   let progressPercentage = 0;
-  let totalParticles = 10;
-  let showSankey = false;
-  let showLabels = false;
-  let colours = {
-    "Low Risk": false,
-    "Med Risk": false,
-    "High Risk": false,
-  };
 
   onMount(() => {
     subscribe('sankey', (message) => {
@@ -40,73 +87,12 @@
       if (progressPercentage < 0) {
         progressPercentage = 0;
       }
-
-      // console.log(progressPercentage);
     }, { indicatorSelector: '.sankey-panel' });
   });
 
 
   let updateState = ((state: any) => {
-    if (state.sankey === 'one') {
-      showSankey = true;
-      showLabels = false;
-      colours = {
-        "Low Risk": false,
-        "Med Risk": false,
-        "High Risk": false,
-      };
-      totalParticles = 50;
-      return;
-    }
-    if (state.sankey === 'two') {
-      showSankey = true;
-      showLabels = true;
-      colours = {
-        "Low Risk": true,
-        "Med Risk": true,
-        "High Risk": true,
-      };
-      totalParticles = 50;
-      return;
-    }
-    if (state.sankey === 'three') {
-      showSankey = true;
-      showLabels = true;
-      colours = {
-        "Low Risk": false,
-        "Med Risk": false,
-        "High Risk": true,
-      };
-      totalParticles = 50;
-      return;
-    }
-    showSankey = false;
   });
-
-  const input = {
-    "Nation A": {
-      "Compliant": {
-        "Low Risk": 11,
-        "Med Risk": 2,
-        // "High Risk": 0,
-      },
-      "Non-Compliant": {
-        // "Low Risk": 2,
-        "Med Risk": 6,
-        "High Risk": 2,
-      },
-    },
-    "Nation B": {
-      // "Compliant": {
-      //   "Low Risk": 5,
-      //   "Med Risk": 5,
-      //   "High Risk": 0,
-      // },
-        // "Low Risk": 0,
-        // "Med Risk": 0,
-        "High Risk": 10,
-    },
-  };
 
   function textNodesUnder(node: Node) {
     const textNodes: Node[] = [];
@@ -166,9 +152,9 @@
 >
   <main class="graphic">
     <div bind:clientWidth={width} bind:clientHeight={height} class="wrapper">
-      {#if width > 0 && height > 0 && showSankey}
+      {#if width > 0 && height > 0}
         <svg width={width} height={height} viewBox="0 0 {width} {height}">
-          <Chart {showLabels} {colours} {progressPercentage} {totalParticles} {orientation} {width} {height} {input} />
+          <Chart {results} {progressPercentage} {width} {height}  />
         </svg>
       {/if}
     </div>

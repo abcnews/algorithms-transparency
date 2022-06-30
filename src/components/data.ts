@@ -1,6 +1,7 @@
 import { hierarchy, sum, range, path } from 'd3';
-import { sankeyTop, sankeyAlignCenter, sankeyBottom, sankeyRight } from 'jtfell-d3-sankey';
+import { sankeyTop, sankeyAlignJustify, sankeyRight } from 'jtfell-d3-sankey';
 
+const isLeaf = n => n.hasOwnProperty('approved');
 const isObject = obj => typeof obj === 'object' && !Array.isArray(obj) && obj !== null;
 
 // Extract unique nodes
@@ -9,7 +10,7 @@ export const genNodes = rawData => {
   const walk = node => {
     for (let name in node) {
       nodes.push(name);
-      if (isObject(node[name])) {
+      if (!isLeaf(node[name])) {
         walk(node[name]);
       }
     }
@@ -24,7 +25,7 @@ export const genLinks = rawData => {
   const walk = (source, sourceNode) => {
     for (let name in sourceNode) {
       links.push({ source, target: name });
-      if (isObject(sourceNode[name])) {
+      if (!isLeaf(sourceNode[name])) {
         walk(name, sourceNode[name]);
       }
     }
@@ -39,7 +40,7 @@ export const genHierarchy = rawData => {
   // converts an object { bitA, bitB, ... } into array [{ name: 'bitA', ... }, { name: 'bitB', ... }, ...]
   // `d3.hierarchy` will use this array to build its data structure
   const getChildren = ({ name, ...otherProps }) =>
-    !isObject(otherProps)
+    isLeaf(otherProps)
       ? undefined // leaves have no children
       : Object.entries(otherProps).map(([name, obj]) => ({ name, ...obj }));
 
@@ -48,35 +49,47 @@ export const genHierarchy = rawData => {
   return (
     hierarchy({ name: 'root', ...rawData }, getChildren)
       .each(d => {
-        d.data = { ...d.data, path: absolutePath(d) };
-      })
-  );
+        const datum: any = {
+          name: d.data.name,
+          // `path` is needed to distinguish nodes with the same name but different ancestors
+          // (e.g. /root/bit501/bit601 vs /root/bit502/bit601)
+          path: absolutePath(d),
+        }
+        if (isLeaf(d.data)) {
+          datum.groups = [{
+            key: 'approved', value: d.data.approved
+          }, {
+            key: 'rejected', value: d.data.rejected
+          }]
+        }
+        d.data = datum
+        console.log(d.data);
+          // d.data = { ...d.data, path: absolutePath(d) };
+        })
+    );
 };
 
 // Sankey layout is used to render the routes. It needs the intput data to be acyclic network
-export const genSankey = (width, height, margin, padding, hierarch, curve, data) => {
-  const nWidth =  width - margin.left - margin.right;
-  const nHeight = height - margin.top - margin.bottom;
-
-  return sankeyRight()
+export const genSankey = (width, height, padding, hierarch, curve, data) => {
+  return sankeyTop()
     .nodeId(d => d.name)
-    .nodeAlign(sankeyAlignCenter)
+    .nodeAlign(sankeyAlignJustify)
     // the width of the node is the length of the horizontal segment of the route (between the curves)
-    .nodeWidth((nWidth / (hierarch.height + 1)) * curve)
+    .nodeWidth(1) // (height / (hierarch.height + 1)) * curve)
     .nodePadding(padding)
-    .size([nHeight, nWidth])
+    .size([width, height])
     (data);
 };
 
 // Consider different groups of the same route as different targets
 // Such data structure format simplifies particle creation and tracking
 export const genTargetsAbs = (hierarchy) => {
-  return hierarchy.leaves().map(l => ({
-    name: l.data.name,
-    path: l.data.path,
-    group: l.data.name,
-    value: l.parent.data[l.data.name],
-  }));
+  return hierarchy.leaves().flatMap(t => (t.data?.groups || []).map(l => ({
+    name: t.data.name,
+    path: t.data.path,
+    group: l.key,
+    value: l.value,
+  })));
 };
 
 export const genTargets = targetsAbsolute => {
