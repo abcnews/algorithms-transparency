@@ -16,6 +16,7 @@
   export let psize;
   export let speed;
 
+  export let onUpdateFinishedParticles;
   export let bandWidth;
   export let width: number;
   export let height: number;
@@ -91,6 +92,22 @@
 
   // Update particles based on "progressPercentage"
   $: {
+    // Reset this count
+    const finishedParticles = {
+      low: {
+        approved: 0,
+        rejected: 0
+      },
+      med: {
+        approved: 0,
+        rejected: 0
+      },
+      high: {
+        approved: 0,
+        rejected: 0
+      },
+    };
+
     particles = particles.map(d => {
       const path = cache[d.target.path];
       if (!path || isNaN(progressPercentage)) {
@@ -102,7 +119,9 @@
       // extract the current and the next point coordinates from the precomputed cache
       let coo = path.points[d.pos]
       if (!coo) {
-        // coo = path.points[99];
+        // Add to graph at the end
+        finishedParticles[d.target.name][d.target.group] += 1;
+
         return {
           ...d,
           x: null,
@@ -116,6 +135,8 @@
         y: coo.y,
       };
     });
+
+    onUpdateFinishedParticles(result.nation, finishedParticles);
   }
 
   $: centeredLinks = sankey.links.map(l => {
@@ -128,7 +149,7 @@
 
 </script>
 
-<g class="links">
+<g class="guides">
   {#each centeredLinks as link, i}
     <path
       d={sankeyLinkVertical()(link)} 
@@ -154,7 +175,6 @@
   {/each}
 </g>
 
-
 <style>
   .particles {
     transition-property: x,y;
@@ -164,7 +184,7 @@
   }
 
   /* Links are drawn by top chart, this is just for guiding the particles */
-  .links {
+  .guides {
     fill: none;
     stroke-opacity: 0;
   }

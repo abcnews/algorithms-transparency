@@ -10,7 +10,7 @@
     {
       nation: {
         name: 'Australia',
-        colour: 'green',
+        colour: 'orange',
         numberOfApplicants: 100,
         dist: {
           low: 0.6,
@@ -40,19 +40,19 @@
         colour: 'blue',
         numberOfApplicants: 100,
         dist: {
-          low: 0.2,
+          low: 0.4,
           med: 0.2,
-          high: 0.6,
+          high: 0.4,
         }
       },
       rejectionRate: 0.22,
       outcome: {
         low: {
-          approved: 15,
+          approved: 65,
           rejected: 10,
         },
         med: {
-          approved: 60,
+          approved: 30,
           rejected: 20,
         },
         high: {
