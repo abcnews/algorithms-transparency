@@ -40,6 +40,7 @@
   // Callback for parent
   export let onLoad: any;
 
+
   // let isIFrameReady: boolean = false;
   const onIframeLoad = () => {
     // isIFrameReady = true;
@@ -60,11 +61,3 @@
   src={`${finalPath}?global=paused`}
   on:load={onIframeLoad}
 />
-
-<style>
-  iframe {
-    margin: auto;
-    width: 100%;
-    height: 100%;
-  }
-</style>

@@ -34,20 +34,22 @@ window.addEventListener('message', (message: { data: MessageData }) => {
       tl.onfinish = null;
       const { start, end, loop } = frame;
 
+      console.log(start, end, loop);
+
       // Don't call next as looping lasts forever
       if (loop) {
         tl.range(start, end || tl.duration()).loop(true);
         return tl.play(start);
       }
 
-      // If there's another frame afterwards set it to play "onfinish"j
+      // If there's another frame afterwards set it to play "onfinish"
       if (frames.length > 0) {
         tl.onfinish = next;
       }
 
       // Play through once
-      tl.range(start, end || tl.duration()).loop(0);
-      return tl.play(start);
+      tl.range(tl.time(), end || tl.duration()).loop(0);
+      return tl.play(tl.time());
     };
 
     return next();

@@ -1,11 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import SVG, { animateMarkers, runCommand, pauseTimeline } from '../KeyshapeSVG/KeyshapeSVG.svelte';
 
   let iframeEl;
 
-  export let width: number;
-  export let height: number;
   export let frameMarker: string;
 
   let currentMarkerState: string | null = null;
@@ -20,12 +17,10 @@
   $: setAnimation(currentMarkerState, frameMarker);
   $: absolutePath = __webpack_public_path__ || '/';
 
-  const setAnimation = (currentState: string, nextFrame: string) => {
+  const setAnimation = (currentState: string | null, nextFrame: string) => {
     if (!nextFrame || currentState === nextFrame) {
       return;
     }
-
-    // console.log(nextFrame);
 
     // Set the current state variable for next time
     currentMarkerState = nextFrame;
@@ -35,9 +30,8 @@
     const loopFrame = { start: `${nextFrame}Loop`, end: String(parseInt(nextFrame) + 1), loop: true };
 
     if (hasLoopFrame(nextFrame)) {
-      
       // If scrolling up, just do the loop frame
-      if (currentState > nextFrame) {
+      if (parseInt(currentState || '0') > parseInt(nextFrame)) {
         return animateMarkers(iframeEl, [loopFrame]);
       }
 
@@ -49,12 +43,12 @@
     } 
 
     // The last frame just has a null end marker
-    if (nextFrame == 5) {
+    if (nextFrame === '5') {
       return animateMarkers(iframeEl, [{ start: nextFrame, loop: false }]);
     }
 
     // If scrolling up, pause at the end state
-    if (currentState > nextFrame) {
+    if (parseInt(currentState || '0') > parseInt(nextFrame)) {
       return animateMarkers(iframeEl, [{ start: nextFrame, end: nextFrame, loop: false }]);
     }
 
@@ -63,19 +57,13 @@
 
 </script>
 
-{#if width > 0 && height > 0}
-  <SVG
-    path={`${absolutePath}Algorithms-1-FullDraft`}
-    bind:iframeEl={iframeEl}
-    onLoad={() => {
-      runCommand(iframeEl, 'globalPlay');
-      pauseTimeline(iframeEl);
+<SVG
+  path={`${absolutePath}Algorithms-1-FullDraft`}
+  bind:iframeEl={iframeEl}
+  onLoad={() => {
+    runCommand(iframeEl, 'globalPlay');
+    pauseTimeline(iframeEl);
 
-      setAnimation(null, frameMarker);
-    }}
-  />
-{/if}
-
-<style lang="scss">
-
-</style>
+    setAnimation(null, frameMarker);
+  }}
+/>
