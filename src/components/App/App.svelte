@@ -1,67 +1,19 @@
 <script lang="ts">
-  import Chart from '../Chart.svelte';
   import Scrollyteller from 'jtfell-svelte-scrollyteller';
   import { onMount } from 'svelte';
   import { subscribe } from '@abcnews/progress-utils';
 
+  import AnimationController from '../AnimationController/AnimationController.svelte';
+  // import SVG from '../KeyshapeSVG/KeyshapeSVG.svelte';
+  // import Simulation from '../Sankey/Simulation.svelte';
+  // import LineChart from '../LineChart/LineChart.svelte';
+
+  let iframeEl;
+
   export let scrollyData: any;
 
-  const results = [
-    {
-      nation: {
-        name: 'Australia',
-        colour: 'orange',
-        numberOfApplicants: 100,
-        dist: {
-          low: 0.6,
-          med: 0.2,
-          high: 0.2,
-        }
-      },
-      rejectionRate: 0.12,
-      outcome: {
-        low: {
-          approved: 75,
-          rejected: 5,
-        },
-        med: {
-          approved: 10,
-          rejected: 20,
-        },
-        high: {
-          approved: 2,
-          rejected: 1,
-        },
-      },
-    },
-    {
-      nation: {
-        name: 'India',
-        colour: 'blue',
-        numberOfApplicants: 100,
-        dist: {
-          low: 0.4,
-          med: 0.2,
-          high: 0.4,
-        }
-      },
-      rejectionRate: 0.22,
-      outcome: {
-        low: {
-          approved: 65,
-          rejected: 10,
-        },
-        med: {
-          approved: 30,
-          rejected: 20,
-        },
-        high: {
-          approved: 40,
-          rejected: 40,
-        },
-      },
-    },
-  ];
+  let year: number = 2015;
+  let frameMarker: string | null = null;
 
   const MOBILE_BREAKPOINT = 480;
   let width: number;
@@ -69,29 +21,43 @@
   // Responsively sized dimensions (1.2:1 on mobile, 1:1 on desktop)
   $: {
     if (width < MOBILE_BREAKPOINT && height) {
-      height = width * 0.7;
+      height = width * 0.6;
     } else {
-      height = width * 0.7;
+      height = width * 0.6;
     }
   }
 
-  let progressPercentage = 0;
-
+  const panelPercentages = {};
   onMount(() => {
-    subscribe('sankey', (message) => {
-      if (!message.data) {
-        return;
-      }
+    const subscribeToYear = (year: number) => {
+      subscribe(`sankey-${year}`, (message) => {
+        if (!message.data) {
+          return;
+        }
 
-      progressPercentage = Math.round(message.data.region * 100);
-      if (progressPercentage < 0) {
-        progressPercentage = 0;
-      }
-    }, { indicatorSelector: '.sankey-panel' });
+        const progressPercentage = Math.round(message.data.region * 100);
+        if (progressPercentage < 0) {
+          progressPercentage = 0;
+        }
+        if (progressPercentage > 100) {
+          progressPercentage = 100;
+        }
+        panelPercentages[String(year)] = progressPercentage;
+      }, { indicatorSelector: `.sankey-panel.year-${year}` });
+    }
+
+    subscribeToYear(2015);
+    subscribeToYear(2016);
+    subscribeToYear(2017);
   });
 
 
   let updateState = ((state: any) => {
+    if (state.frame) {
+      frameMarker = String(state.frame);
+    }
+
+    year = state.simulate;
   });
 
   function textNodesUnder(node: Node) {
@@ -115,9 +81,10 @@
   const preprocessPanels = (panels) => {
     // add a class to all the panels that the sankey covers so we can use them as progress
     return panels.map(p => {
-      if (p?.data.sankey) {
-        p.panelClass = 'sankey-panel';
+      if (p?.data.simulate) {
+        p.panelClass = `sankey-panel year-${p.data.simulate}`;
       }
+
       return p;
     });
   };
@@ -153,26 +120,30 @@
   <main class="graphic">
     <div bind:clientWidth={width} bind:clientHeight={height} class="wrapper">
       {#if width > 0 && height > 0}
-        <svg width={width} height={height} viewBox="0 0 {width} {height}">
-          <Chart {results} {progressPercentage} {width} {height}  />
-        </svg>
+        <AnimationController {width} {height} {frameMarker} />
+        <!-- <Simulation {year} progressPercentage={panelPercentages[year]} {width} {height} /> -->
       {/if}
     </div>
   </main>
 </Scrollyteller>
 
 <style lang="scss">
+  :global(.Main, html) {
+    background: #c5b8df;
+  }
+
   .graphic {
     position: relative;
     height: 100vh;
-    width: 100vw;
+    width: 100vh; /* We want to force 1:1 ratio, and lose the sides */
   }
 
   .wrapper {
     margin-top: 0.75rem;
-    padding: 1rem;
     height: 100%;
-    /* max-width: 60rem; */
+    width: 100%;
+
+    margin-left: calc((100vw - 100%) / 2);
   }
 
   :global(.panel-text-highlight) {
@@ -189,9 +160,12 @@
 
   @media (min-width: 76rem) {
     .wrapper {
-      margin-left: 5vw !important;
-      width: 50vw;
+      margin-left: 2vw;
     }
+    /* .wrapper { */
+    /*   margin-left: 5vw !important; */
+    /*   width: 50vw; */
+    /* } */
 
     :global(.scrollyteller .st-panel),
     :global(.scrollyteller .panel) {

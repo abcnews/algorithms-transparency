@@ -1,3 +1,5 @@
+import { INITIAL_YEAR, AUS, INDIA, REJECTION_RATES } from '../constants';
+
 // Must add up to 1
 interface RiskDist {
   low: number;
@@ -35,51 +37,60 @@ interface SimulationResult {
       approved: number;
       rejected: number;
     };
-  }
+  };
 }
 
 export const simulate = (nation: Nation, rates: RejectionRates): SimulationResult => {
   const { name, numberOfApplicants, dist } = nation;
+  const outcome = {
+    low: {
+      rejected: numberOfApplicants * dist.low * rates.low,
+      approved: numberOfApplicants * dist.low * (1 - rates.low)
+    },
+    med: {
+      rejected: numberOfApplicants * dist.med * rates.med,
+      approved: numberOfApplicants * dist.med * (1 - rates.med)
+    },
+    high: {
+      rejected: numberOfApplicants * dist.high * rates.high,
+      approved: numberOfApplicants * dist.high * (1 - rates.high)
+    }
+  };
+
   return {
     nation,
-    rejectionRate:
-      (numberOfApplicants * dist.low * rates.low +
-        numberOfApplicants * dist.med * rates.med +
-        numberOfApplicants * dist.high * rates.high) /
-      numberOfApplicants,
-    outcome: {
-      low: {
-        rejected: numberOfApplicants * dist.low * rates.low,
-        approved: numberOfApplicants * (1 - dist.low * rates.low)
-      },
-      med: {
-        rejected: numberOfApplicants * dist.med * rates.med,
-        approved: numberOfApplicants * (1 - dist.med * rates.med)
-      },
-      high: {
-        rejected: numberOfApplicants * dist.high * rates.high,
-        approved: numberOfApplicants * (1 - dist.high * rates.high)
-      }
-    }
+    rejectionRate: (outcome.low.rejected + outcome.med.rejected + outcome.high.rejected) / numberOfApplicants,
+    outcome
   };
 };
 
+const getRejectionRate = (result: SimulationResult): number => {
+  const {
+    outcome: { low, med, high },
+    nation
+  } = result;
+
+  return (low.rejected + med.rejected + high.rejected) / nation.numberOfApplicants;
+};
+
 export const updateNation = (nation: Nation, results: SimulationResult[]): Nation => {
-  const thisResults = results.find(r => r.nation.name === nation.name);
-  const otherResults = results.find(r => r.nation.name !== nation.name);
-  if (results.length !== 2 || !thisResults || !otherResults) {
+  const thisResult = results.find(r => r.nation.name === nation.name);
+  const otherResult = results.find(r => r.nation.name !== nation.name);
+  if (results.length !== 2 || !thisResult || !otherResult) {
     throw new Error('Bad results');
   }
 
-  // const thisRR =
-  //   thisResults.low.rejected + thisResults.med.rejected + thisResults.high.rejected / nation.numberOfApplicants;
-  // const otherRR =
-  //   otherResults.low.rejected + otherResults.med.rejected + otherResults.high.rejected / nation.numberOfApplicants;
+  const thisRR = getRejectionRate(thisResult);
+  const otherRR = getRejectionRate(otherResult);
 
-  // TODO: Optimisation problem?
-  const low = 0.4;
-  const med = 0.4;
-  const high = 0.2;
+  const ratio = Math.max(0.5, Math.min(2, thisRR / otherRR));
+
+  // Set the ratio of high vs low risk people to be equal to the ratio between the rejection rates
+  const high = (1 / 3) * ratio;
+  const low = 2 / 3 - high;
+
+  // Leave medium-risk dist equal
+  const med = 1 / 3;
 
   return {
     ...nation,
@@ -87,9 +98,23 @@ export const updateNation = (nation: Nation, results: SimulationResult[]): Natio
   };
 };
 
-// List of SimulationResults is input into Sankey:
-//
-// {for result in results}
-//   {for particle in result.particles}
-//     <rect>
-//
+export const runSimulation = (year: number): SimulationResult[] => {
+  if (year < INITIAL_YEAR) {
+    throw new Error(`Cant run sim before ${INITIAL_YEAR}`);
+  }
+
+  let australia = AUS;
+  let india = INDIA;
+
+  let results: SimulationResult[] = [];
+  for (let y = INITIAL_YEAR; y <= year; y++) {
+    const ausRes = simulate(australia, REJECTION_RATES);
+    const indRes = simulate(india, REJECTION_RATES);
+    results = [ausRes, indRes];
+
+    australia = updateNation(australia, results);
+    india = updateNation(india, results);
+  }
+
+  return results;
+};

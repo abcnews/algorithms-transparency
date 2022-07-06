@@ -14,6 +14,7 @@ module.exports = {
     includedDependencies,
     entry: [
       "index",
+      "svg-iframe-controller",
       "googledoc"
     ],
   },

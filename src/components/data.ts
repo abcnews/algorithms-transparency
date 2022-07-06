@@ -63,22 +63,8 @@ export const genHierarchy = rawData => {
           }]
         }
         d.data = datum
-        console.log(d.data);
-          // d.data = { ...d.data, path: absolutePath(d) };
-        })
+      })
     );
-};
-
-// Sankey layout is used to render the routes. It needs the intput data to be acyclic network
-export const genSankey = (width, height, padding, hierarch, curve, data) => {
-  return sankeyTop()
-    .nodeId(d => d.name)
-    .nodeAlign(sankeyAlignJustify)
-    // the width of the node is the length of the horizontal segment of the route (between the curves)
-    .nodeWidth(1) // (height / (hierarch.height + 1)) * curve)
-    .nodePadding(padding)
-    .size([width, height])
-    (data);
 };
 
 // Consider different groups of the same route as different targets
