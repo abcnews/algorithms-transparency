@@ -58,7 +58,7 @@
 </script>
 
 <SVG
-  path={`${absolutePath}Algorithms-1-FullDraft`}
+  path={`${absolutePath}Algorithms-1-FullDraft.svg`}
   bind:iframeEl={iframeEl}
   onLoad={() => {
     runCommand(iframeEl, 'globalPlay');

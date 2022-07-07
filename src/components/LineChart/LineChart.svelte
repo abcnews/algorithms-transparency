@@ -42,10 +42,10 @@
 	
 	let el;
 	
-	export let width: number;
-	export let height: number;
+	let width: number;
 	const margin = { top: 20, bottom: 20, left: 40, right: 20 };
 
+	$: height = Math.min(300, width * 0.8);
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
 
@@ -113,75 +113,81 @@
   .line {
     stroke-width: 2px;
   }
+
+  .svg-wrapper {
+		width: 100%;
+		height: 100%;
+  }
 </style>
 
 <Legend />
 
-<svg bind:this={el} transform="translate({margin.left}, {margin.top})">
-  <g class="box">
-    <rect
-      fill="#EDF0F2"
-      x={xScale(2015)}
-      y={0}
-      width={xScale(2020) - xScale(2015)}
-      height={innerHeight}
-    />
-    <!-- Algo markers -->
-		<path stroke="grey" d="{algoStartPath}" stroke-dasharray="4" fill="none" />
-		<path stroke="grey" d="{algoEndPath}" stroke-dasharray="4" fill="none" />
-    <text x={(xScale(2015) + xScale(2020)) / 2} y={20}>Algorithm in use</text>
-  </g>
+<div class="svg-wrapper" bind:clientWidth={width} style="height:{height}px;">
+  <svg bind:this={el} transform="translate({margin.left}, {margin.top})">
+    <g class="box">
+      <rect
+        fill="#EDF0F2"
+        x={xScale(2015)}
+        y={0}
+        width={xScale(2020) - xScale(2015)}
+        height={innerHeight}
+      />
+      <!-- Algo markers -->
+      <path stroke="grey" d="{algoStartPath}" stroke-dasharray="4" fill="none" />
+      <path stroke="grey" d="{algoEndPath}" stroke-dasharray="4" fill="none" />
+      <text x={(xScale(2015) + xScale(2020)) / 2} y={20}>Algorithm in use</text>
+    </g>
 
-	<g class="line">
-    <!-- lines -->
-    <path 
-      d="{ausPath(data)}"
-      fill="none"
-      stroke="{LINE_CHART_COLOURS.Australia}"
-    />
-    <path 
-      d="{usPath(data)}"
-      fill="none"
-      stroke="{LINE_CHART_COLOURS['United States']}"
-    />
-    <path 
-      d="{nepalPath(data)}"
-      fill="none"
-      stroke="{LINE_CHART_COLOURS.Nepal}"
-    />
-    <path 
-      d="{syriaPath(data)}"
-      fill="none"
-      stroke="{LINE_CHART_COLOURS.Syria}"
-    />
+    <g class="line">
+      <!-- lines -->
+      <path 
+        d="{ausPath(data)}"
+        fill="none"
+        stroke="{LINE_CHART_COLOURS.Australia}"
+      />
+      <path 
+        d="{usPath(data)}"
+        fill="none"
+        stroke="{LINE_CHART_COLOURS['United States']}"
+      />
+      <path 
+        d="{nepalPath(data)}"
+        fill="none"
+        stroke="{LINE_CHART_COLOURS.Nepal}"
+      />
+      <path 
+        d="{syriaPath(data)}"
+        fill="none"
+        stroke="{LINE_CHART_COLOURS.Syria}"
+      />
 
-  </g>
-	
-	<!-- y axis -->
-	<g>
-		<path stroke="currentColor" transform="translate({0}, 0)" d="{yPath}" fill="none" />
+    </g>
+    
+    <!-- y axis -->
+    <g>
+      <path stroke="currentColor" transform="translate({0}, 0)" d="{yPath}" fill="none" />
 
-		{#each yTicks as y} 
-      <g class="tick y" opacity="1" transform="translate({0},{yScale(y)})">
-				<path stroke="currentColor" x2="5" />
-				<text dy="0.32em" fill="currentColor" x="-2">
-					{y}%
-				</text>
-			</g>
- 		{/each}
-	</g>
-	
-	<!-- x axis -->
-	<g transform="translate(0, {innerHeight})">
-		<path stroke="currentColor" d="{xPath}" fill="none" />
-		
-		{#each xTicks as x} 
-			<g class="tick x" opacity="1" transform="translate({xScale(x)},0)">
-				<path stroke="currentColor" y2="6" />
-				<text fill="currentColor" y="9" dy="0.71em" x="0">
-					{x}
-				</text>
-			</g>
-		{/each}
-</svg>
-
+      {#each yTicks as y} 
+        <g class="tick y" opacity="1" transform="translate({0},{yScale(y)})">
+          <path stroke="currentColor" x2="5" />
+          <text dy="0.32em" fill="currentColor" x="-2">
+            {y}%
+          </text>
+        </g>
+      {/each}
+    </g>
+    
+    <!-- x axis -->
+    <g transform="translate(0, {innerHeight})">
+      <path stroke="currentColor" d="{xPath}" fill="none" />
+      
+      {#each xTicks as x} 
+        <g class="tick x" opacity="1" transform="translate({xScale(x)},0)">
+          <path stroke="currentColor" y2="6" />
+          <text fill="currentColor" y="9" dy="0.71em" x="0">
+            {x}
+          </text>
+        </g>
+      {/each}
+  </svg>
+</div>

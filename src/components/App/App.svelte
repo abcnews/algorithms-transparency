@@ -13,7 +13,7 @@
   // let year: number = 2015;
   let frameMarker: string | null = null;
 
-  const MOBILE_BREAKPOINT = 1215;
+  const MOBILE_BREAKPOINT = 480;
   let width: number;
   let height: number;
   // Responsively sized dimensions (1.2:1 on mobile, 1:1 on desktop)
@@ -58,7 +58,13 @@
   });
 
   // Centre the iframe on small screens
-  $: xOffset = width / 2 - (width - height) / 2;
+  let xOffset: number;
+  $: {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const w = width - scrollbarWidth;
+    xOffset = w/2 - (w - height) / 2 + scrollbarWidth / 2;
+  }
+  $: absolutePath = __webpack_public_path__ || '/';
 </script>
 
 <Scrollyteller
@@ -66,17 +72,19 @@
   onMarker={updateState}
 >
   <main bind:clientWidth={width} bind:clientHeight={height} class="graphic" style="--x-offset: -{xOffset}px">
-      <div class="noise" />
-      {#if width > 0 && height > 0}
-        <AnimationController width={height} {height} {frameMarker} />
-        <!-- <Simulation {year} progressPercentage={panelPercentages[year]} {width} {height} /> -->
-      {/if}
+    <div class="noise" style="background-image: url({absolutePath}Noise.png)" />
+    <AnimationController {frameMarker} />
+    <!-- <Simulation {year} progressPercentage={panelPercentages[year]} {width} {height} /> -->
   </main>
 </Scrollyteller>
 
 <style lang="scss">
+  :global(html) {
+    --background-colour: #c5b8df;
+  }
+
   :global(.Main, html) {
-    background: #c5b8df;
+    background: var(--background-colour);
   }
 
   .graphic {
@@ -94,8 +102,8 @@
     /* We want to force 1:1 ratio, and lose the sides */
     width: 100vh;
     height: 100vh;
-    transform: translate(var(--x-offset),-50%);
-    max-width: 200vw;
+    transform: translate(var(--x-offset), -50%);
+    max-width: 5000vw;
   }
 
   .noise {
@@ -108,20 +116,27 @@
     background-repeat: repeat;
     opacity: 0.25;
     z-index: 99;
-    background-image: url(/Noise.png);
+    /* background-image: url(/Noise.png); */
   }
 
-  :global(.panel-text-highlight) {
-    margin: 0 0.05em;
-    border: 0.125rem solid transparent;
-    padding: 0 0.2em;
-    display: inline-block;
-    color: #fff;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1.25;
-    white-space: nowrap;
-  }
+  /* :global(.panel-text-highlight) { */
+  /*   margin: 0 0.05em; */
+  /*   border: 0.125rem solid transparent; */
+  /*   padding: 0 0.2em; */
+  /*   display: inline-block; */
+  /*   color: #fff; */
+  /*   font-style: normal; */
+  /*   font-weight: normal; */
+  /*   line-height: 1.25; */
+  /*   white-space: nowrap; */
+  /* } */
+
+  /* :global(.scrollyteller .st-panel)::before, */
+  /* :global(.scrollyteller .panel)::before { */
+  /*   background: #c5b8df !important; */
+  /*   box-shadow: none; */
+  /*   opacity: 0.8; */
+  /* } */
 
   @media (min-width: 76rem) {
     :global(.graphic iframe) {

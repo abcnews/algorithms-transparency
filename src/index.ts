@@ -2,7 +2,9 @@ import acto from '@abcnews/alternating-case-to-object';
 import { whenOdysseyLoaded } from '@abcnews/env-utils';
 import { getMountValue, selectMounts } from '@abcnews/mount-utils';
 import { loadScrollyteller } from 'jtfell-svelte-scrollyteller';
+
 import App from './components/App/App.svelte';
+import LineChart from './components/LineChart/LineChart.svelte';
 
 let appMountEl1;
 let appMountEl2;
@@ -17,6 +19,15 @@ whenOdysseyLoaded.then(() => {
     new App({
       target: appMountEl1,
       props: { scrollyData }
+    });
+  }
+
+  const mounts = selectMounts('linechart');
+  appMountEl2 = mounts[0];
+  if (appMountEl2) {
+    new LineChart({
+      target: appMountEl2,
+      props: {}
     });
   }
 });

@@ -30,9 +30,6 @@
 </script>
 
 <script lang="ts">
-  const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
   // Allow parent to bind to this element
   export let iframeEl: HTMLIFrameElement;
   // Path of SVG asset
@@ -50,7 +47,9 @@
   };
 
   // detect and handle iOS devices and serve alternate svg
-  $: finalPath = `${path.replace('.svg', '')}${IS_SAFARI || IS_IOS ? '__safari' : ''}.svg`;
+  // const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  // const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  // $: finalPath = `${path.replace('.svg', '')}${IS_SAFARI || IS_IOS ? '__safari' : ''}.svg`;
 </script>
 
 <iframe
@@ -58,6 +57,6 @@
   title="Graphic"
   frameBorder="0"
   scrolling="no"
-  src={`${finalPath}?global=paused`}
+  src={`${path}?global=paused`}
   on:load={onIframeLoad}
 />
