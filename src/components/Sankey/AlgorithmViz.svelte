@@ -22,6 +22,8 @@
 
   export let state: string | null;
 
+  $: console.log(state);
+
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
   $: bandWidth = innerWidth / 4 - padding * 3;
