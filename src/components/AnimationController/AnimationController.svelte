@@ -3,12 +3,20 @@
 
   let iframeEl;
 
-  export let frameMarker: string;
+  export let frameMarker: string | null;
+  export let scrollytellerName: string;
 
   let currentMarkerState: string | null = null;
 
-  const hasLoopFrame = (frameMarker) => {
-    if (frameMarker == 4 || frameMarker == 5) {
+  const SVGS = {
+    first: 'Algorithms-1-FullDraft.svg',
+    second: 'Algorithms-1-FullDraft.svg',
+  };
+  $: svgPath = SVGS[scrollytellerName];
+
+  // TODO: Needs to work for each scrollyteller, not just the first one
+  const hasLoopFrame = (frameMarker: string | null) => {
+    if (frameMarker === '4' || frameMarker === '5') {
       return false;
     }
     return true;
@@ -17,7 +25,7 @@
   $: setAnimation(currentMarkerState, frameMarker);
   $: absolutePath = __webpack_public_path__ || '/';
 
-  const setAnimation = (currentState: string | null, nextFrame: string) => {
+  const setAnimation = (currentState: string | null, nextFrame: string | null) => {
     if (!nextFrame || currentState === nextFrame) {
       return;
     }
@@ -58,7 +66,7 @@
 </script>
 
 <SVG
-  path={`${absolutePath}Algorithms-1-FullDraft.svg`}
+  path={`${absolutePath}${svgPath}`}
   bind:iframeEl={iframeEl}
   onLoad={() => {
     runCommand(iframeEl, 'globalPlay');

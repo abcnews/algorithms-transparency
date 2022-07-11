@@ -6,27 +6,40 @@ import { loadScrollyteller } from 'jtfell-svelte-scrollyteller';
 import App from './components/App/App.svelte';
 import LineChart from './components/LineChart/LineChart.svelte';
 
-let appMountEl1;
-let appMountEl2;
+let appMounts: any[] = [];
+let appMountChart;
 let appProps;
 
-whenOdysseyLoaded.then(() => {
-  const scrollyData = loadScrollyteller('first', 'u-full', 'mark');
-  appMountEl1 = scrollyData.mountNode;
+const SCROLLYTELLERS = [
+  'first',
+  'second',
+  'third',
+  'fourth',
+];
 
-  if (appMountEl1) {
-    const mark = getMountValue(appMountEl1);
-    new App({
-      target: appMountEl1,
-      props: { scrollyData }
-    });
-  }
+whenOdysseyLoaded.then(() => {
+  SCROLLYTELLERS.forEach((name, i) => {
+    try {
+      const scrollyData = loadScrollyteller(name, 'u-full', 'mark');
+      appMounts[i] = scrollyData.mountNode;
+
+      if (appMounts[i]) {
+        const mark = getMountValue(appMounts[i]);
+        new App({
+          target: appMounts[i],
+          props: { scrollyData }
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  });
 
   const mounts = selectMounts('linechart');
-  appMountEl2 = mounts[0];
-  if (appMountEl2) {
+  appMountChart = mounts[0];
+  if (appMountChart) {
     new LineChart({
-      target: appMountEl2,
+      target: appMountChart,
       props: {}
     });
   }

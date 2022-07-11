@@ -10,7 +10,7 @@
     genTargets,
     genThresholds,
     genRoutes,
-  } from './data';
+  } from '../data';
 
   export let padding;
   export let psize;

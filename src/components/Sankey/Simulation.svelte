@@ -1,13 +1,14 @@
 <script lang="ts">
   import AlgorithmViz from './AlgorithmViz.svelte';
-  import { runSimulation } from '../lib/model';
+  import { runSimulation } from '../../lib/model';
 
   export let width: number;
   export let height: number;
   export let progressPercentage: number;
-  export let year: number;
+  export let year: string;
+  export let state: string | null;
 
-  $: results = runSimulation(year);
+  $: results = runSimulation(parseInt(year) || 2015);
 </script>
 
 {#if results.length}
@@ -17,5 +18,6 @@
     {progressPercentage}
     {results}
     {year}
+    {state}
   />
 {/if}

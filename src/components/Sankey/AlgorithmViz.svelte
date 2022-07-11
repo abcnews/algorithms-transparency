@@ -4,7 +4,7 @@
   import {
     genNodes,
     genLinks,
-  } from './data';
+  } from '../data';
   import NationParticles from './NationParticles.svelte';
 
   // const margin = { top: 0, bottom: 0, left: 0, right: 0 };
@@ -18,7 +18,9 @@
   export let height: number;
   export let progressPercentage: number;
   export let results: any;
-  export let year: number;
+  export let year: string;
+
+  export let state: string | null;
 
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
@@ -133,79 +135,83 @@
         />
       {/each}
 
-      <g
-        transform="translate(0, {sankeyHeight + margin.bottom + padding})"
-      >
-        <text class="labels" x={8} y={15}>Approved</text>
-        <rect
-          x={5}
-          width={innerWidth / 2 - 10}
-          y={0}
-          height={innerHeight * 0.25}
-          fill={'green'}
-          opacity={0.6}
-        />
-        {#each range(approvedCount0) as i}
+      {#if year !== 'none' && year !== 'historical'}
+        <g
+          transform="translate(0, {sankeyHeight + margin.bottom + padding})"
+        >
+          <text class="labels" x={8} y={15}>Approved</text>
           <rect
-            class="particle"
-            opacity="0.8"
-            fill="blue"
-            width={psize}
-            height={(innerHeight * 0.25 - 20) * 0.5 - 20}
-            x={7 + i}
-            y={20}
+            x={5}
+            width={innerWidth / 2 - 10}
+            y={0}
+            height={innerHeight * 0.25}
+            fill={'green'}
+            opacity={0.6}
           />
-        {/each}
-        {#each range(approvedCount1) as i}
+          {#each range(approvedCount0) as i}
+            <rect
+              class="particle"
+              opacity="0.8"
+              fill="blue"
+              width={psize}
+              height={(innerHeight * 0.25 - 20) * 0.5 - 20}
+              x={7 + i}
+              y={20}
+            />
+          {/each}
+          {#each range(approvedCount1) as i}
+            <rect
+              class="particle"
+              opacity="0.8"
+              fill="orange"
+              width={psize}
+              height={(innerHeight * 0.25 - 20) * 0.5 - 20}
+              x={7 + i}
+              y={20 + (innerHeight * 0.25 - 20) * 0.25}
+            />
+          {/each}
+          <text class="labels" x={5 + innerWidth / 2 + 8} y={15}>Rejected</text>
           <rect
-            class="particle"
-            opacity="0.8"
-            fill="orange"
-            width={psize}
-            height={(innerHeight * 0.25 - 20) * 0.5 - 20}
-            x={7 + i}
-            y={20 + (innerHeight * 0.25 - 20) * 0.25}
+            x={5 + innerWidth / 2}
+            width={innerWidth / 2 - 10} 
+            y={0}
+            height={innerHeight * 0.25}
+            fill={'red'}
+            opacity={0.6}
           />
-        {/each}
-        <text class="labels" x={5 + innerWidth / 2 + 8} y={15}>Rejected</text>
-        <rect
-          x={5 + innerWidth / 2}
-          width={innerWidth / 2 - 10} 
-          y={0}
-          height={innerHeight * 0.25}
-          fill={'red'}
-          opacity={0.6}
-        />
 
-        {#each range(rejectedCount0) as i}
-          <rect
-            class="particle"
-            opacity="0.8"
-            fill="blue"
-            width={psize}
-            height={(innerHeight * 0.25 - 20) * 0.5 - 20}
-            x={5 + innerWidth / 2 + 7 + i}
-            y={20}
-          />
-        {/each}
-        {#each range(rejectedCount1) as i}
-          <rect
-            class="particle"
-            opacity="0.8"
-            fill="orange"
-            width={psize}
-            height={(innerHeight * 0.25 - 20) * 0.5 - 20}
-            x={5 + innerWidth / 2 + 7 + i}
-            y={20 + (innerHeight * 0.25 - 20) * 0.25}
-          />
-        {/each}
+          {#each range(rejectedCount0) as i}
+            <rect
+              class="particle"
+              opacity="0.8"
+              fill="blue"
+              width={psize}
+              height={(innerHeight * 0.25 - 20) * 0.5 - 20}
+              x={5 + innerWidth / 2 + 7 + i}
+              y={20}
+            />
+          {/each}
+          {#each range(rejectedCount1) as i}
+            <rect
+              class="particle"
+              opacity="0.8"
+              fill="orange"
+              width={psize}
+              height={(innerHeight * 0.25 - 20) * 0.5 - 20}
+              x={5 + innerWidth / 2 + 7 + i}
+              y={20 + (innerHeight * 0.25 - 20) * 0.25}
+            />
+          {/each}
 
-      </g>
+        </g>
+      {/if}
 
       <g class="labels">
-        <g transform="translate({innerWidth - 40}, {40})" text-anchor="end">
-          <text>Year: {year}</text>
-        </g>
+        {#if year !== 'none'}
+          <g transform="translate({innerWidth - 40}, {40})" text-anchor="end">
+            <text>Year: {year}</text>
+          </g>
+        {/if}
 
         {#each centeredLinks as link}
           <g transform="translate({link.y1}, {sankeyHeight - 20})" text-anchor="middle">
@@ -218,10 +224,14 @@
 </svg>
 
 <style>
+  svg {
+    background: rgb(31, 20, 41);
+  }
+
   .links {
     fill: none;
     stroke-opacity: 1;
-    stroke: rgb(255 230 230);
+    stroke: var(--background-colour);
   }
 
   .wrapper {

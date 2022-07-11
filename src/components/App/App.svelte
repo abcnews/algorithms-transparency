@@ -1,61 +1,83 @@
 <script lang="ts">
   import Scrollyteller from 'jtfell-svelte-scrollyteller';
-  // import { onMount } from 'svelte';
-  // import { subscribe } from '@abcnews/progress-utils';
+  import { onMount } from 'svelte';
+  import { subscribe } from '@abcnews/progress-utils';
 
   import AnimationController from '../AnimationController/AnimationController.svelte';
-  // import SVG from '../KeyshapeSVG/KeyshapeSVG.svelte';
-  // import Simulation from '../Sankey/Simulation.svelte';
-  // import LineChart from '../LineChart/LineChart.svelte';
+  import Simulation from '../Sankey/Simulation.svelte';
 
   export let scrollyData: any;
 
-  // let year: number = 2015;
+  // HIGH LEVEL STATE
+  let scrollytellerName = 'second';
   let frameMarker: string | null = null;
 
-  const MOBILE_BREAKPOINT = 480;
-  let width: number;
-  let height: number;
-  // Responsively sized dimensions (1.2:1 on mobile, 1:1 on desktop)
-  // $: {
-  //   if (width < MOBILE_BREAKPOINT && height) {
-  //     height = width * 0.6;
-  //   } else {
-  //     height = width * 0.6;
-  //   }
-  // }
+  // SANKEY
+  // none, historical, 2015, 2016, 2017
+  let sankeyYear: string = '2015';
+  // running, finished, updated
+  let sankeyState: string | null = null;
 
-  // const panelPercentages = {};
-  // onMount(() => {
-  //   const subscribeToYear = (year: number) => {
-  //     subscribe(`sankey-${year}`, (message) => {
-  //       if (!message.data) {
-  //         return;
-  //       }
-  //
-  //       const progressPercentage = Math.round(message.data.region * 100);
-  //       if (progressPercentage < 0) {
-  //         progressPercentage = 0;
-  //       }
-  //       if (progressPercentage > 100) {
-  //         progressPercentage = 100;
-  //       }
-  //       panelPercentages[String(year)] = progressPercentage;
-  //     }, { indicatorSelector: `.sankey-panel.year-${year}` });
-  //   }
-  //
-  //   subscribeToYear(2015);
-  //   subscribeToYear(2016);
-  //   subscribeToYear(2017);
-  // });
+  const isSankeyFrame = (name: string, frame: string | null) => {
+    if (name === 'second' && frame === '3') {
+      return true;
+    }
+
+    return false;
+  };
+
+  const panelPercentages = {};
+  onMount(() => {
+    const subscribeToYear = (year: number) => {
+      subscribe(`sankey-${year}`, (message: any) => {
+        if (!message.data) {
+          return;
+        }
+
+        let progressPercentage = Math.round(message.data.region * 100);
+        if (progressPercentage < 0) {
+          progressPercentage = 0;
+        }
+        if (progressPercentage > 100) {
+          progressPercentage = 100;
+        }
+        panelPercentages[String(year)] = progressPercentage;
+      }, { indicatorSelector: `.sankey-panel.year-${year}.state-running` });
+    }
+
+    subscribeToYear(2015);
+    subscribeToYear(2016);
+    subscribeToYear(2017);
+  });
+
+  const preprocessPanels = (panels: any[]) => {
+    // add a class to all the panels that the sankey covers so we can use them as progress
+    return panels.map(p => {
+      if (p?.data.sankey) {
+        p.panelClass = `sankey-panel year-${p.data.year} state-${p.data.state || ''}`;
+      }
+      return p;
+    });
+  };
 
   let updateState = ((state: any) => {
+    // console.log(state);
     if (state.frame) {
       frameMarker = String(state.frame);
     }
+    if (state.name) {
+      scrollytellerName = state.name;
+    }
 
-    // year = state.simulate;
+    if (state.sankey) {
+      sankeyYear = state.year;
+      sankeyState = state.state;
+    }
   });
+
+  // Position the graphic
+  let width: number;
+  let height: number;
 
   // Centre the iframe on small screens
   let xOffset: number;
@@ -68,13 +90,16 @@
 </script>
 
 <Scrollyteller
-  panels={scrollyData.panels}
+  panels={preprocessPanels(scrollyData.panels)}
   onMarker={updateState}
 >
   <main bind:clientWidth={width} bind:clientHeight={height} class="graphic" style="--x-offset: -{xOffset}px">
     <div class="noise" style="background-image: url({absolutePath}Noise.png)" />
-    <AnimationController {frameMarker} />
-    <!-- <Simulation {year} progressPercentage={panelPercentages[year]} {width} {height} /> -->
+    {#if isSankeyFrame(scrollytellerName, frameMarker)}
+      <Simulation year={sankeyYear} state={sankeyState} progressPercentage={panelPercentages[sankeyYear]} {width} {height} />
+    {:else}
+      <AnimationController {scrollytellerName} {frameMarker} />
+    {/if}
   </main>
 </Scrollyteller>
 
@@ -82,18 +107,17 @@
   :global(html) {
     --background-colour: #c5b8df;
   }
-
   :global(.Main, html) {
     background: var(--background-colour);
   }
-
   .graphic {
     position: relative;
     height: 100vh;
     width: 100vw;
   }
 
-  :global(.graphic iframe) {
+  /* size and position the visuals based on the viewport height */
+  :global(.graphic iframe, .graphic svg) {
     /* https://jonathannicol.com/blog/2014/06/16/centre-crop-thumbnails-with-css/ */
     position: absolute;
     left: 50%;
@@ -106,6 +130,7 @@
     max-width: 5000vw;
   }
 
+  /* cover the graphic with the noise texture */
   .noise {
     position: absolute;
     left: 0;
@@ -116,7 +141,29 @@
     background-repeat: repeat;
     opacity: 0.25;
     z-index: 99;
-    /* background-image: url(/Noise.png); */
+  }
+
+  /* Move the graphic to the left and the text to the right on desktop */
+  @media (min-width: 76rem) {
+    :global(.graphic iframe, .graphic svg) {
+      transform: translate(-50vw, -50%);
+    }
+
+    :global(.scrollyteller .st-panel),
+    :global(.scrollyteller .panel) {
+      margin-left: 55vw !important;
+      max-width: 40vw !important;
+    }
+  }
+
+
+  /* Get the transition into the title right */
+  :global(#scrollytellerNAMEfirstFRAME1) {
+    margin-bottom: -53vh;
+  }
+  :global(.Header, .Main.u-layout > p) {
+    z-index: 100;
+    position: relative;
   }
 
   /* :global(.panel-text-highlight) { */
@@ -137,17 +184,5 @@
   /*   box-shadow: none; */
   /*   opacity: 0.8; */
   /* } */
-
-  @media (min-width: 76rem) {
-    :global(.graphic iframe) {
-      transform: translate(-50vw, -50%);
-    }
-
-    :global(.scrollyteller .st-panel),
-    :global(.scrollyteller .panel) {
-      margin-left: 55vw !important;
-      max-width: 40vw !important;
-    }
-  }
 
 </style>
