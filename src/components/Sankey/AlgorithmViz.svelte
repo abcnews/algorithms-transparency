@@ -14,6 +14,9 @@
   const psize = 4;
   const speed = 2;
 
+  const TOP_PIPE_HEIGHT = 0.2;
+  const SANKEY_HEIGHT = 0.35;
+
   export let width: number;
   export let height: number;
   export let progressPercentage: number;
@@ -27,7 +30,9 @@
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
   $: bandWidth = innerWidth / 4 - padding * 3;
-  $: sankeyHeight = innerHeight * 0.75;
+
+  $: topPipeHeight = innerHeight * TOP_PIPE_HEIGHT;
+  $: sankeyHeight = innerHeight * SANKEY_HEIGHT;
 
   // Draw links based on the first results structure (it will be the same for both)
   $: nodes = genNodes(results[0].outcome);
@@ -112,8 +117,25 @@
 </script>
 
 <svg {width} {height} viewBox="0 0 {width} {height}">
+  <defs>
+    <linearGradient id="linearSankey" x1="0%" y1="60%" x2="0%" y2="0%">
+      <stop offset="0%"   stop-color="#C5B8DF"/>
+      <stop offset="55%" stop-color="#C5B8DF"/>
+    </linearGradient>
+  </defs>
+
   <g class="wrapper" {width} {height}>
     <g transform="translate({margin.left}, {margin.top})">
+      <rect
+        class="middle-link"
+        x={innerWidth / 2 - bandWidth / 2}
+        fill={"url(#linearSankey)"}
+        width={bandWidth}
+        y={0}
+        height={sankeyHeight + topPipeHeight}
+      />
+    </g>
+    <g transform="translate({margin.left}, {margin.top + topPipeHeight})">
       <g class="links">
         {#each centeredLinks as link}
           <path
@@ -123,10 +145,13 @@
         {/each}
       </g>
 
+
       {#each results as result}
         <NationParticles
           width={innerWidth}
-          height={sankeyHeight}
+          height={height}
+          topHeightPercentage={TOP_PIPE_HEIGHT}
+          sankeyHeightPercentage={SANKEY_HEIGHT}
           {bandWidth}
           {progressPercentage}
           {result}
@@ -137,87 +162,40 @@
         />
       {/each}
 
-      {#if year !== 'none' && year !== 'historical'}
-        <g
-          transform="translate(0, {sankeyHeight + margin.bottom + padding})"
-        >
-          <text class="labels" x={8} y={15}>Approved</text>
-          <rect
-            x={5}
-            width={innerWidth / 2 - 10}
-            y={0}
-            height={innerHeight * 0.25}
-            fill={'green'}
-            opacity={0.6}
-          />
-          {#each range(approvedCount0) as i}
-            <rect
-              class="particle"
-              opacity="0.8"
-              fill="blue"
-              width={psize}
-              height={(innerHeight * 0.25 - 20) * 0.5 - 20}
-              x={7 + i}
-              y={20}
-            />
-          {/each}
-          {#each range(approvedCount1) as i}
-            <rect
-              class="particle"
-              opacity="0.8"
-              fill="orange"
-              width={psize}
-              height={(innerHeight * 0.25 - 20) * 0.5 - 20}
-              x={7 + i}
-              y={20 + (innerHeight * 0.25 - 20) * 0.25}
-            />
-          {/each}
-          <text class="labels" x={5 + innerWidth / 2 + 8} y={15}>Rejected</text>
-          <rect
-            x={5 + innerWidth / 2}
-            width={innerWidth / 2 - 10} 
-            y={0}
-            height={innerHeight * 0.25}
-            fill={'red'}
-            opacity={0.6}
-          />
-
-          {#each range(rejectedCount0) as i}
-            <rect
-              class="particle"
-              opacity="0.8"
-              fill="blue"
-              width={psize}
-              height={(innerHeight * 0.25 - 20) * 0.5 - 20}
-              x={5 + innerWidth / 2 + 7 + i}
-              y={20}
-            />
-          {/each}
-          {#each range(rejectedCount1) as i}
-            <rect
-              class="particle"
-              opacity="0.8"
-              fill="orange"
-              width={psize}
-              height={(innerHeight * 0.25 - 20) * 0.5 - 20}
-              x={5 + innerWidth / 2 + 7 + i}
-              y={20 + (innerHeight * 0.25 - 20) * 0.25}
-            />
-          {/each}
-
-        </g>
-      {/if}
-
       <g class="labels">
-        {#if year !== 'none'}
-          <g transform="translate({innerWidth - 40}, {40})" text-anchor="end">
-            <text>Year: {year}</text>
+        {#if year !== 'none' && year !== 'historical'}
+          <g class="year-label" transform="translate({innerWidth / 2}, {(sankeyHeight / 2) * 0.90})" text-anchor="middle">
+            <text>{year}</text>
           </g>
         {/if}
 
+        {#if year !== 'none' && year !== 'historical'}
+          <g class="refusals-label" transform="translate({innerWidth / 2}, {sankeyHeight + 85})" text-anchor="middle">
+            <text>refusals</text>
+          </g>
+
+          <g class="refusals-label" style="fill:{results[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+            <text>4%</text>
+          </g>
+          <g style="fill:{results[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 - 20})">
+            <circle cx={0} cy={0} r={10} />
+          </g>
+
+          <g class="refusals-label" style="fill:{results[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+            <text>7%</text>
+          </g>
+          <g style="fill:{results[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 - 20})">
+            <circle cx={0} cy={0} r={10} />
+          </g>
+
+        {/if}
+
         {#each centeredLinks as link}
-          <g transform="translate({link.y1}, {sankeyHeight - 20})" text-anchor="middle">
-            <text>{link.target.name}</text>
+          <g transform="translate({link.y1}, {sankeyHeight + 5})" text-anchor="middle">
+            <text>
+              <tspan x="1" dy="1.2em" text-anchor="middle">{link.target.name}</tspan>
+              <tspan x="0" dy="1.2em" text-anchor="middle">risk</tspan>
+            </text>
           </g>
         {/each}
       </g>
@@ -227,13 +205,20 @@
 
 <style>
   svg {
-    background: rgb(31, 20, 41);
+    background: #1B1023;
   }
 
+  .middle-link {
+    /* fill: url(#linearSankey); */
+    fill: #9187a3;
+  }
   .links {
     fill: none;
     stroke-opacity: 1;
-    stroke: var(--background-colour);
+    stroke: #9187a3;
+    /* stroke: url(#linearSankey); */
+    /* stroke: var(--background-colour); */
+    /* stroke: linear-gradient(179.46deg, rgba(197, 184, 223, 0) 0.48%, rgba(197, 184, 223, 0.55) 99.55%); */
   }
 
   .wrapper {
@@ -244,5 +229,15 @@
     font-family: ABCSans, Helvetica, sans-serif;
     font-weight: 700;
     text-transform: uppercase;
+    fill: white;
+    font-size: 12px;
+  }
+
+  .labels .year-label {
+    font-size: 28px;
+  }
+
+  .labels .refusals-label {
+    font-size: 18px;
   }
 </style>

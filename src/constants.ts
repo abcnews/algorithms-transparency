@@ -12,14 +12,14 @@ export const INITIAL_DIST_AUS = {
 
 export const INDIA = {
   name: 'India',
-  colour: 'orange',
+  colour: '#6B81FF',
   numberOfApplicants: 100,
   dist: INITIAL_DIST_IND,
 }
 
 export const AUS = {
   name: 'Australia',
-  colour: 'black',
+  colour: '#FF5148',
   numberOfApplicants: 100,
   dist: INITIAL_DIST_AUS,
 }

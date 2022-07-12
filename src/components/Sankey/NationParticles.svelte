@@ -23,6 +23,9 @@
   export let progressPercentage: number;
   export let result: any;
 
+  export let topHeightPercentage: number;
+  export let sankeyHeightPercentage: number;
+
   $: nodes = genNodes(result.outcome);
   $: links = genLinks(result.outcome);
 
@@ -38,7 +41,7 @@
       .nodeAlign(sankeyAlignJustify)
       .nodeWidth(1)
       .nodePadding(padding)
-      .size([width, height])
+      .size([width, height * sankeyHeightPercentage])
     (dataForSankey);
     
   $: targetsAbs = genTargetsAbs(hierarchy);
@@ -56,20 +59,34 @@
 
   // takes a random number [0..1] and returns vertical position on the band
   $: offsetScale = scaleLinear()
-    .range([-bandWidth / 2 - psize / 2, bandWidth / 2 - psize / 2])
+    .range([-bandWidth / 2 + psize, bandWidth / 2 - psize])
 
   // takes a random number [0..1] and returns particle speed
   $: speedScale = scaleLinear().range([1, 1 + speed])
 
+  $: positionScale = scaleLinear().domain([0, 100]).range([-1 * topHeightPercentage, sankeyHeightPercentage]);
+
+  let topPath: SVGPathElement;
   let paths: SVGPathElement[] = [];
   let cache = {};
   $: {
     console.log(width);
     paths.forEach((path, i) => {
       // Compute particle positions along the lines.
-      const length = path.getTotalLength();
       const route = routes[i].map(r => `/${r.name}`).join('');
-      cache[route] = { points: range(100).map((x: number) => path.getPointAtLength(x * length / 100)) };
+      const points = range(100).map((y: number) => {
+        const yPosition = positionScale(y);
+        if (yPosition < 0) {
+          const length = topPath.getTotalLength();
+          const progress = -1 * (yPosition / topHeightPercentage);
+          return topPath.getPointAtLength(progress * length);
+        }
+
+        const length = path.getTotalLength();
+        return path.getPointAtLength((yPosition / sankeyHeightPercentage) * length);
+      });
+
+      cache[route] = { points };
     });
   }
 
@@ -114,6 +131,10 @@
         return d;
       }
 
+      // console.log(topPipeHeight);
+      // const yPosition = positionScale(progressPercentage);
+      // console.log(yPosition);
+
       // every particle appears at its own time, so adjust the global time `t` to local time
       d.pos = Math.floor(progressPercentage * d.speed);
       // extract the current and the next point coordinates from the precomputed cache
@@ -151,6 +172,14 @@
 </script>
 
 <g class="guides">
+    <line
+      x1={width / 2 - 1}
+      x2={width / 2 + 1}
+      y1={0}
+      y2={-1 * height * topHeightPercentage}
+      bind:this={topPath}
+    />
+
   {#each centeredLinks as link, i}
     <path
       d={sankeyLinkVertical()(link)} 
@@ -163,14 +192,13 @@
 <g class="particles">
   {#each particles as particle}
     {#if particle.x && particle.y}
-      <rect
+      <circle
         class="particle"
-        opacity="0.8"
-        fill={particle.colour}
-        width={psize}
-        height={psize}
-        x={particle.x}
-        y={particle.y}
+        opacity="1"
+        fill="{particle.colour}"
+        r={psize}
+        cx={particle.x}
+        cy={particle.y}
       />
     {/if}
   {/each}
@@ -182,6 +210,9 @@
     transition-duration: 2s;
     width: 100%;
     height: 100%;
+
+    /* stroke: #5d5165; */
+    /* stroke-width: 1px; */
   }
 
   /* Links are drawn by top chart, this is just for guiding the particles */

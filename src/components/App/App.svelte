@@ -9,7 +9,7 @@
   export let scrollyData: any;
 
   // HIGH LEVEL STATE
-  let scrollytellerName = 'second';
+  let scrollytellerName = 'first';
   let frameMarker: string | null = null;
 
   // SANKEY
@@ -19,6 +19,7 @@
   let sankeyState: string | null = null;
 
   const isSankeyFrame = (name: string, frame: string | null) => {
+    // console.log(name, frame);
     if (name === 'second' && frame === '3') {
       return true;
     }
@@ -78,6 +79,13 @@
   // Position the graphic
   let width: number;
   let height: number;
+  let simWidth: number;
+
+  $: backgroundColour = isSankeyFrame(scrollytellerName, frameMarker) ? '#1B1023' : '#c5b8df';
+
+  $: {
+    simWidth = Math.min(400, width);
+  }
 
   // Centre the iframe on small screens
   let xOffset: number;
@@ -93,10 +101,16 @@
   panels={preprocessPanels(scrollyData.panels)}
   onMarker={updateState}
 >
-  <main bind:clientWidth={width} bind:clientHeight={height} class="graphic" style="--x-offset: -{xOffset}px">
+<main bind:clientWidth={width} bind:clientHeight={height} class="graphic" style="--x-offset: -{xOffset}px; background: {backgroundColour}">
     <div class="noise" style="background-image: url({absolutePath}Noise.png)" />
     {#if isSankeyFrame(scrollytellerName, frameMarker)}
-      <Simulation year={sankeyYear} state={sankeyState} progressPercentage={panelPercentages[sankeyYear]} {width} {height} />
+        <Simulation
+          year={sankeyYear}
+          state={sankeyState}
+          progressPercentage={panelPercentages[sankeyYear]}
+          width={simWidth}
+          height={height}
+        />
     {:else}
       <AnimationController {scrollytellerName} {frameMarker} />
     {/if}
@@ -164,6 +178,11 @@
   :global(.Header, .Main.u-layout > p) {
     z-index: 100;
     position: relative;
+  }
+
+  :global(#scrollytellerNAMEfirstFRAME1 .st-panel):last-child ,
+  :global(#scrollytellerNAMEfirstFRAME1 .panel):last-child {
+    margin-bottom: 100vh;
   }
 
   /* :global(.panel-text-highlight) { */
