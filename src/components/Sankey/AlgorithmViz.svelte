@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { sum, range } from 'd3';
+  import { sum } from 'd3';
   import { sankeyTop, sankeyLinkVertical } from 'jtfell-d3-sankey';
   import {
     genNodes,
     genLinks,
   } from '../data';
+
   import NationParticles from './NationParticles.svelte';
+  import HistoricalData from './HistoricalData.svelte';
 
   // const margin = { top: 0, bottom: 0, left: 0, right: 0 };
   // const margin = { top: 25, bottom: 25, left: 25, right: 25 };
@@ -20,7 +22,7 @@
   export let width: number;
   export let height: number;
   export let progressPercentage: number;
-  export let results: any;
+  export let results: Record<string, any>;
   export let year: string;
 
   export let state: string | null;
@@ -34,9 +36,12 @@
   $: topPipeHeight = innerHeight * TOP_PIPE_HEIGHT;
   $: sankeyHeight = innerHeight * SANKEY_HEIGHT;
 
+  $: activeResults = year === 'historical' || year === 'none' ? results['2015'] : results[year];
+
   // Draw links based on the first results structure (it will be the same for both)
-  $: nodes = genNodes(results[0].outcome);
-  $: links = genLinks(results[0].outcome);
+  $: nodes = genNodes(activeResults[0].outcome);
+  $: links = genLinks(activeResults[0].outcome);
+
   $: sankey = sankeyTop()
       .nodeId(d => d.name)
       .nodeWidth(1)
@@ -81,7 +86,7 @@
   let rejectedCount1 = 0;
 
   const onUpdateFinishedParticles = (nation, finished) => {
-    const nationId = results.findIndex(r => r.nation.name === nation.name);
+    const nationId = activeResults.findIndex(r => r.nation.name === nation.name);
     if (nationId === -1) {
       throw new Error('no good');
     }
@@ -146,7 +151,7 @@
       </g>
 
 
-      {#each results as result}
+      {#each activeResults as result}
         <NationParticles
           width={innerWidth}
           height={height}
@@ -162,6 +167,15 @@
         />
       {/each}
 
+      <g transform="translate({width * 0.2}, {-1 * TOP_PIPE_HEIGHT * height * 0.6})">
+        <HistoricalData
+          {year}
+          {results}
+          width={width * 0.6}
+          height={TOP_PIPE_HEIGHT * height}
+        />
+      </g>
+
       <g class="labels">
         {#if year !== 'none' && year !== 'historical'}
           <g class="year-label" transform="translate({innerWidth / 2}, {(sankeyHeight / 2) * 0.90})" text-anchor="middle">
@@ -169,22 +183,22 @@
           </g>
         {/if}
 
-        {#if year !== 'none' && year !== 'historical'}
+        {#if rejectedCount0 && rejectedCount1}
           <g class="refusals-label" transform="translate({innerWidth / 2}, {sankeyHeight + 85})" text-anchor="middle">
-            <text>refusals</text>
+            <text>Refusals</text>
           </g>
 
-          <g class="refusals-label" style="fill:{results[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
-            <text>4%</text>
+          <g class="refusals-label" style="fill:{activeResults[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+            <text>{Math.floor(rejectedCount0 / (approvedCount0 + rejectedCount0) * 100) || 0}%</text>
           </g>
-          <g style="fill:{results[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 - 20})">
+          <g style="fill:{activeResults[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 - 20})">
             <circle cx={0} cy={0} r={10} />
           </g>
 
-          <g class="refusals-label" style="fill:{results[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
-            <text>7%</text>
+          <g class="refusals-label" style="fill:{activeResults[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+            <text>{Math.floor(rejectedCount1 / (approvedCount1 + rejectedCount1) * 100) || 0}%</text>
           </g>
-          <g style="fill:{results[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 - 20})">
+          <g style="fill:{activeResults[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 - 20})">
             <circle cx={0} cy={0} r={10} />
           </g>
 

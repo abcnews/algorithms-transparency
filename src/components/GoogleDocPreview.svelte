@@ -8,6 +8,7 @@
 
   let scrollyData;
   let introPars = [];
+  let name = 'first';
 
   const updateDoc = async (url: string) => {
     localStorage.setItem(URL_LOCALSTORAGE_KEY, url);
@@ -22,6 +23,7 @@
       if (scrollytellerDefinition) {
         introPars = intro;
         scrollyData = scrollytellerDefinition;
+        name = scrollytellerDefinition.panels[0].data.name;
       } else {
         introPars = [];
         scrollyData = null;
@@ -33,6 +35,7 @@
   };
 
   $: updateDoc(googleDocUrl);
+
 
 </script>
 
@@ -46,7 +49,7 @@
   {/each}
 
   <div class="u-full">
-    <App scrollyData={scrollyData} />
+    <App scrollyData={scrollyData} name={name} />
   </div>
 {:else}
     <p class="FormatCredit">

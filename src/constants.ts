@@ -1,3 +1,5 @@
+export const HISTORICAL_REJECTION_RATES = [0.24, 0.34];
+
 export const INITIAL_DIST_IND = {
   low: 1 / 6,
   med: 2 / 6,

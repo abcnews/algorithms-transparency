@@ -7,9 +7,10 @@
   import Simulation from '../Sankey/Simulation.svelte';
 
   export let scrollyData: any;
+  export let name: string;
 
   // HIGH LEVEL STATE
-  let scrollytellerName = 'first';
+  let scrollytellerName = name || 'first';
   let frameMarker: string | null = null;
 
   // SANKEY
@@ -66,9 +67,9 @@
     if (state.frame) {
       frameMarker = String(state.frame);
     }
-    if (state.name) {
-      scrollytellerName = state.name;
-    }
+    // if (state.name) {
+    //   scrollytellerName = state.name;
+    // }
 
     if (state.sankey) {
       sankeyYear = state.year;
@@ -102,7 +103,6 @@
   onMarker={updateState}
 >
 <main bind:clientWidth={width} bind:clientHeight={height} class="graphic" style="--x-offset: -{xOffset}px; background: {backgroundColour}">
-    <div class="noise" style="background-image: url({absolutePath}Noise.png)" />
     {#if isSankeyFrame(scrollytellerName, frameMarker)}
         <Simulation
           year={sankeyYear}
@@ -112,6 +112,7 @@
           height={height}
         />
     {:else}
+      <div class="noise" style="background-image: url({absolutePath}Noise.png)" />
       <AnimationController {scrollytellerName} {frameMarker} />
     {/if}
   </main>

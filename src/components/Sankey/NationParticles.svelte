@@ -29,6 +29,8 @@
   $: nodes = genNodes(result.outcome);
   $: links = genLinks(result.outcome);
 
+  $: console.log(Math.round(result.rejectionRate * 100));
+
   // Common data structure format that d3 uses to layout networks (e.g. d3-sankey, d3-force)
   $: dataForSankey = {
     nodes: nodes.map(n => ({ ...n, fixedValue: 1 })), // `fixedValue`, because all nodes have fixed height
@@ -92,7 +94,7 @@
 
   // Initial state of particles
   $: particles = range(result.nation.numberOfApplicants).map(id => {
-    const target = targetScale(Math.random())
+    const target = targetScale(id / 100);
     return {
       id,
       speed: speedScale(Math.random()),
@@ -130,10 +132,6 @@
       if (!path || isNaN(progressPercentage)) {
         return d;
       }
-
-      // console.log(topPipeHeight);
-      // const yPosition = positionScale(progressPercentage);
-      // console.log(yPosition);
 
       // every particle appears at its own time, so adjust the global time `t` to local time
       d.pos = Math.floor(progressPercentage * d.speed);

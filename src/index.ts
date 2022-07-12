@@ -27,7 +27,7 @@ whenOdysseyLoaded.then(() => {
         const mark = getMountValue(appMounts[i]);
         new App({
           target: appMounts[i],
-          props: { scrollyData }
+          props: { scrollyData, name }
         });
       }
     } catch (e) {
