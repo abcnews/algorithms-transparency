@@ -4,6 +4,8 @@
   export let y: number;
   export let size: number;
 
+  $: absolutePath = __webpack_public_path__ || '/';
+
   const SQUARE_STAR_ASPECT_RATIO = 22/19;
   const SQUARE_STAR_DOWNSIZE = 0.8;
   const PI = 3.14;
@@ -11,7 +13,7 @@
 
 {#if colour === '#FF5148'}
   <image
-    href="/squarestar.svg"
+    href="{absolutePath}squarestar.svg"
     width={size * PI * SQUARE_STAR_ASPECT_RATIO * SQUARE_STAR_DOWNSIZE}
     height={size * PI * SQUARE_STAR_DOWNSIZE}
     x={x - size * (PI / 2) * SQUARE_STAR_ASPECT_RATIO * SQUARE_STAR_DOWNSIZE}
