@@ -2,6 +2,8 @@
   import { scaleLinear, scaleThreshold, range } from "d3";
   import { sankeyTop, sankeyAlignJustify, sankeyLinkVertical } from 'jtfell-d3-sankey';
 
+  import Particle from './Particle.svelte';
+
   import {
     genNodes,
     genLinks,
@@ -29,7 +31,7 @@
   $: nodes = genNodes(result.outcome);
   $: links = genLinks(result.outcome);
 
-  $: console.log(Math.round(result.rejectionRate * 100));
+  // $: console.log(Math.round(result.rejectionRate * 100));
 
   // Common data structure format that d3 uses to layout networks (e.g. d3-sankey, d3-force)
   $: dataForSankey = {
@@ -190,13 +192,11 @@
 <g class="particles">
   {#each particles as particle}
     {#if particle.x && particle.y}
-      <circle
-        class="particle"
-        opacity="1"
-        fill="{particle.colour}"
-        r={psize}
-        cx={particle.x}
-        cy={particle.y}
+      <Particle
+        colour={particle.colour}
+        size={psize}
+        x={particle.x}
+        y={particle.y}
       />
     {/if}
   {/each}

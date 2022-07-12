@@ -7,10 +7,10 @@
 <text class="label white smaller" x={width * 0.5} y={0} text-anchor="middle">
   {label}
 </text>
-<text class="label smaller" fill={result[0].nation.colour} x={0} y={0} text-anchor="start">
+<text class="label smaller" fill={result[0].nation.colour} x={10} y={0} text-anchor="start">
   {Math.floor(result[0].rejectionRate * 100)}%
 </text>
-<text class="label smaller" fill={result[1].nation.colour} x={width} y={0} text-anchor="end">
+<text class="label smaller" fill={result[1].nation.colour} x={width - 10} y={0} text-anchor="end">
   {Math.floor(result[1].rejectionRate * 100)}%
 </text>
 

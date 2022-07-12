@@ -1,5 +1,6 @@
 <script lang="ts">
   import HistoricalDataPoint from './HistoricalDataPoint.svelte';
+  import Particle from './Particle.svelte';
 
   export let width: number;
   export let height: number;
@@ -19,6 +20,19 @@
     <text class="label" x={width * 0.5} y={25} text-anchor="middle">
       Enforcement Rates
     </text>
+
+    <Particle
+      colour={results['2015'][0].nation.colour}
+      size={6}
+      x={20}
+      y={25}
+    />
+    <Particle
+      colour={results['2015'][1].nation.colour}
+      size={6}
+      x={width - 20}
+      y={25}
+    />
 
     <g transform="translate(0, {0 * (height - 55) / 3 + 55})">
       <HistoricalDataPoint

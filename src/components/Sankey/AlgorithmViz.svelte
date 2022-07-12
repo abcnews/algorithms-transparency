@@ -7,6 +7,7 @@
   } from '../data';
 
   import NationParticles from './NationParticles.svelte';
+  import Particle from './Particle.svelte';
   import HistoricalData from './HistoricalData.svelte';
 
   // const margin = { top: 0, bottom: 0, left: 0, right: 0 };
@@ -123,23 +124,18 @@
 
 <svg {width} {height} viewBox="0 0 {width} {height}">
   <defs>
-    <linearGradient id="linearSankey" x1="0%" y1="60%" x2="0%" y2="0%">
-      <stop offset="0%"   stop-color="#C5B8DF"/>
-      <stop offset="55%" stop-color="#C5B8DF"/>
+    <linearGradient id="linearSankey" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#8b81a3"/>
+      <stop offset="80%" stop-color="#393542"/>
+    </linearGradient>
+    <linearGradient id="linearPipe" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#8b81a3"/>
+      <stop offset="36%" stop-color="#8b81a3"/>
+      <stop offset="86%" stop-color="#393542"/>
     </linearGradient>
   </defs>
 
   <g class="wrapper" {width} {height}>
-    <g transform="translate({margin.left}, {margin.top})">
-      <rect
-        class="middle-link"
-        x={innerWidth / 2 - bandWidth / 2}
-        fill={"url(#linearSankey)"}
-        width={bandWidth}
-        y={0}
-        height={sankeyHeight + topPipeHeight}
-      />
-    </g>
     <g transform="translate({margin.left}, {margin.top + topPipeHeight})">
       <g class="links">
         {#each centeredLinks as link}
@@ -150,6 +146,14 @@
         {/each}
       </g>
 
+      <rect
+        class="middle-link"
+        x={innerWidth / 2 - bandWidth / 2}
+        fill={"url(#linearPipe)"}
+        width={bandWidth}
+        y={-1 * topPipeHeight}
+        height={sankeyHeight + topPipeHeight}
+      />
 
       {#each activeResults as result}
         <NationParticles
@@ -188,18 +192,14 @@
             <text>Refusals</text>
           </g>
 
+          <Particle x={80} y={sankeyHeight + 85 - 15} size={8} colour={activeResults[0].nation.colour} />
           <g class="refusals-label" style="fill:{activeResults[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
             <text>{Math.round(rejectedCount0 / (approvedCount0 + rejectedCount0) * 100) || 0}%</text>
           </g>
-          <g style="fill:{activeResults[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 - 20})">
-            <circle cx={0} cy={0} r={10} />
-          </g>
 
+          <Particle x={innerWidth - 82} y={sankeyHeight + 85 - 15} size={8} colour={activeResults[1].nation.colour} />
           <g class="refusals-label" style="fill:{activeResults[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
             <text>{Math.round(rejectedCount1 / (approvedCount1 + rejectedCount1) * 100) || 0}%</text>
-          </g>
-          <g style="fill:{activeResults[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 - 20})">
-            <circle cx={0} cy={0} r={10} />
           </g>
 
         {/if}
@@ -222,17 +222,12 @@
     background: #1B1023;
   }
 
-  .middle-link {
-    /* fill: url(#linearSankey); */
-    fill: #9187a3;
-  }
-  .links {
+  .links > path {
     fill: none;
     stroke-opacity: 1;
-    stroke: #9187a3;
-    /* stroke: url(#linearSankey); */
+    /* stroke: #9187a3; */
+    stroke: url(#linearSankey);
     /* stroke: var(--background-colour); */
-    /* stroke: linear-gradient(179.46deg, rgba(197, 184, 223, 0) 0.48%, rgba(197, 184, 223, 0.55) 99.55%); */
   }
 
   .wrapper {
