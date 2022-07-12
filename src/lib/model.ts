@@ -1,11 +1,5 @@
 import { INITIAL_YEAR, AUS, INDIA, REJECTION_RATES } from '../constants';
-
-// Must add up to 1
-interface RiskDist {
-  low: number;
-  med: number;
-  high: number;
-}
+import { calcDist, RiskDist } from './calc';
 
 // A point in time (one year)
 interface Nation {
@@ -83,18 +77,9 @@ export const updateNation = (nation: Nation, results: SimulationResult[]): Natio
   const thisRR = getRejectionRate(thisResult);
   const otherRR = getRejectionRate(otherResult);
 
-  const ratio = Math.max(0.5, Math.min(2, thisRR / otherRR));
-
-  // Set the ratio of high vs low risk people to be equal to the ratio between the rejection rates
-  const high = (1 / 3) * ratio;
-  const low = 2 / 3 - high;
-
-  // Leave medium-risk dist equal
-  const med = 1 / 3;
-
   return {
     ...nation,
-    dist: { low, med, high }
+    dist: calcDist(thisRR, otherRR), // { low, med, high }
   };
 };
 

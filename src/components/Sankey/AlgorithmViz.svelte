@@ -189,14 +189,14 @@
           </g>
 
           <g class="refusals-label" style="fill:{activeResults[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
-            <text>{Math.floor(rejectedCount0 / (approvedCount0 + rejectedCount0) * 100) || 0}%</text>
+            <text>{Math.round(rejectedCount0 / (approvedCount0 + rejectedCount0) * 100) || 0}%</text>
           </g>
           <g style="fill:{activeResults[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 - 20})">
             <circle cx={0} cy={0} r={10} />
           </g>
 
           <g class="refusals-label" style="fill:{activeResults[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
-            <text>{Math.floor(rejectedCount1 / (approvedCount1 + rejectedCount1) * 100) || 0}%</text>
+            <text>{Math.round(rejectedCount1 / (approvedCount1 + rejectedCount1) * 100) || 0}%</text>
           </g>
           <g style="fill:{activeResults[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 - 20})">
             <circle cx={0} cy={0} r={10} />
