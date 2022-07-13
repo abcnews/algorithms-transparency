@@ -1,10 +1,7 @@
 <script lang="ts">
   import Scrollyteller from 'jtfell-svelte-scrollyteller';
-  import { onMount } from 'svelte';
-  import { subscribe } from '@abcnews/progress-utils';
-
   import AnimationController from '../AnimationController/AnimationController.svelte';
-  import Simulation from '../Sankey/Simulation.svelte';
+  import Simulation, { preprocessPanels } from '../Sankey/Simulation.svelte';
 
   export let scrollyData: any;
   export let name: string;
@@ -20,56 +17,23 @@
   let sankeyState: string | null = null;
 
   const isSankeyFrame = (name: string, frame: string | null) => {
-    // console.log(name, frame);
+    // UK Visa Processing
     if (name === 'second' && frame === '3') {
+      return true;
+    }
+
+    // Algorithmic Audits
+    if (name === 'forth') {
       return true;
     }
 
     return false;
   };
 
-  const panelPercentages = {};
-  onMount(() => {
-    const subscribeToYear = (year: number) => {
-      subscribe(`sankey-${year}`, (message: any) => {
-        if (!message.data) {
-          return;
-        }
-
-        let progressPercentage = Math.round(message.data.region * 100);
-        if (progressPercentage < 0) {
-          progressPercentage = 0;
-        }
-        if (progressPercentage > 100) {
-          progressPercentage = 100;
-        }
-        panelPercentages[String(year)] = progressPercentage;
-      }, { indicatorSelector: `.sankey-panel.year-${year}.state-running` });
-    }
-
-    subscribeToYear(2015);
-    subscribeToYear(2016);
-    subscribeToYear(2017);
-  });
-
-  const preprocessPanels = (panels: any[]) => {
-    // add a class to all the panels that the sankey covers so we can use them as progress
-    return panels.map(p => {
-      if (p?.data.sankey) {
-        p.panelClass = `sankey-panel year-${p.data.year} state-${p.data.state || ''}`;
-      }
-      return p;
-    });
-  };
-
   let updateState = ((state: any) => {
-    // console.log(state);
     if (state.frame) {
       frameMarker = String(state.frame);
     }
-    // if (state.name) {
-    //   scrollytellerName = state.name;
-    // }
 
     if (state.sankey) {
       sankeyYear = state.year;
@@ -83,6 +47,7 @@
   let simWidth: number;
 
   $: backgroundColour = isSankeyFrame(scrollytellerName, frameMarker) ? '#1B1023' : '#c5b8df';
+  $: noiseOpacity = isSankeyFrame(scrollytellerName, frameMarker) ? '0.12' : '0.25';
 
   $: {
     simWidth = Math.min(400, width);
@@ -103,16 +68,20 @@
   onMarker={updateState}
 >
 <main bind:clientWidth={width} bind:clientHeight={height} class="graphic" style="--x-offset: -{xOffset}px; background: {backgroundColour}">
+
+    <div
+      class="noise"
+      style="background-image: url({absolutePath}Noise.png); opacity: {noiseOpacity};"
+    />
+
     {#if isSankeyFrame(scrollytellerName, frameMarker)}
-        <Simulation
-          year={sankeyYear}
-          state={sankeyState}
-          progressPercentage={panelPercentages[sankeyYear]}
-          width={simWidth}
-          height={height}
-        />
+      <Simulation
+        year={sankeyYear}
+        state={sankeyState}
+        width={simWidth}
+        height={height}
+      />
     {:else}
-      <div class="noise" style="background-image: url({absolutePath}Noise.png)" />
       <AnimationController {scrollytellerName} {frameMarker} />
     {/if}
   </main>
@@ -141,27 +110,14 @@
     /* We want to force 1:1 ratio, and lose the sides */
     width: 100vh;
     height: 100vh;
-    transform: translate(var(--x-offset), -50%);
+    transform: translate(var(--x-offset), -45%);
     max-width: 5000vw;
-  }
-
-  /* cover the graphic with the noise texture */
-  .noise {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    width: 1000vw;
-    transform: translate(-500px, 0%);
-    background-repeat: repeat;
-    opacity: 0.25;
-    z-index: 99;
   }
 
   /* Move the graphic to the left and the text to the right on desktop */
   @media (min-width: 76rem) {
     :global(.graphic iframe, .graphic svg) {
-      transform: translate(-50vw, -50%);
+      transform: translate(-50vw, -45%);
     }
 
     :global(.scrollyteller .st-panel),
@@ -170,7 +126,6 @@
       max-width: 40vw !important;
     }
   }
-
 
   /* Get the transition into the title right */
   :global(#scrollytellerNAMEfirstFRAME1) {

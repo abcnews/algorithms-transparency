@@ -14,18 +14,18 @@ export const HISTORICAL_REJECTION_RATES = [0.26, 0.33];
 //   high: 1 / 6,
 // };
 
-// blue
-export const INDIA = {
+// red
+export const RED = {
   name: 'India',
-  colour: '#6B81FF',
+  colour: '#FF5148',
   numberOfApplicants: 100,
   dist: calcDist(HISTORICAL_REJECTION_RATES[1], HISTORICAL_REJECTION_RATES[0]),
 }
 
-// red
-export const AUS = {
+// blue
+export const BLUE = {
   name: 'Australia',
-  colour: '#FF5148',
+  colour: '#6B81FF',
   numberOfApplicants: 100,
   dist: calcDist(HISTORICAL_REJECTION_RATES[0], HISTORICAL_REJECTION_RATES[1]),
 }

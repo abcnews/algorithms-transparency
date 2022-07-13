@@ -1,4 +1,4 @@
-import { INITIAL_YEAR, AUS, INDIA, REJECTION_RATES } from '../constants';
+import { INITIAL_YEAR, RED, BLUE, REJECTION_RATES } from '../constants';
 import { calcDist, RiskDist } from './calc';
 
 // A point in time (one year)
@@ -88,8 +88,8 @@ export const runSimulation = (year: number): SimulationResult[] => {
     throw new Error(`Cant run sim before ${INITIAL_YEAR}`);
   }
 
-  let australia = AUS;
-  let india = INDIA;
+  let australia = BLUE;
+  let india = RED;
 
   let results: SimulationResult[] = [];
   for (let y = INITIAL_YEAR; y <= year; y++) {

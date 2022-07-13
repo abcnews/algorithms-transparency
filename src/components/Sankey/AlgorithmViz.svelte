@@ -8,7 +8,7 @@
 
   import NationParticles from './NationParticles.svelte';
   import Particle from './Particle.svelte';
-  import HistoricalData from './HistoricalData.svelte';
+  // import HistoricalData from './HistoricalData.svelte';
 
   // const margin = { top: 0, bottom: 0, left: 0, right: 0 };
   // const margin = { top: 25, bottom: 25, left: 25, right: 25 };
@@ -17,8 +17,8 @@
   const psize = 4;
   const speed = 2;
 
-  const TOP_PIPE_HEIGHT = 0.2;
-  const SANKEY_HEIGHT = 0.35;
+  const TOP_PIPE_HEIGHT = 0.1;
+  const SANKEY_HEIGHT = 0.25;
 
   export let width: number;
   export let height: number;
@@ -120,18 +120,23 @@
     rejectedCount1 = total.rejected[1];
   };
 
+  const GRADIENT_END = 0.8;
+
+  $: stop1 = Math.round(TOP_PIPE_HEIGHT / (TOP_PIPE_HEIGHT + SANKEY_HEIGHT) * 100);
+  $: stop2 = Math.round((100 - stop1) * GRADIENT_END);
 </script>
 
 <svg {width} {height} viewBox="0 0 {width} {height}">
   <defs>
     <linearGradient id="linearSankey" x2="0" y2="1">
       <stop offset="0%"   stop-color="#8b81a3"/>
-      <stop offset="80%" stop-color="#393542"/>
+      <stop offset="{GRADIENT_END * 100}%" stop-color="#393542"/>
     </linearGradient>
     <linearGradient id="linearPipe" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#8b81a3"/>
-      <stop offset="36%" stop-color="#8b81a3"/>
-      <stop offset="86%" stop-color="#393542"/>
+      <stop offset="0%"   stop-color="#393542"/>
+      <stop offset="20%"   stop-color="#8b81a3"/>
+      <stop offset="{stop1}%" stop-color="#8b81a3"/>
+      <stop offset="{stop1 + stop2}%" stop-color="#393542"/>
     </linearGradient>
   </defs>
 
@@ -141,6 +146,7 @@
         {#each centeredLinks as link}
           <path
             d={sankeyLinkVertical()(link)} 
+            stroke={"url(#linearSankey)"}
             stroke-width={bandWidth}
           />
         {/each}
@@ -171,14 +177,14 @@
         />
       {/each}
 
-      <g transform="translate({width * 0.2}, {-1 * TOP_PIPE_HEIGHT * height * 0.6})">
-        <HistoricalData
-          {year}
-          {results}
-          width={width * 0.6}
-          height={TOP_PIPE_HEIGHT * height}
-        />
-      </g>
+      <!-- <g transform="translate({width * 0.2}, {-1 * TOP_PIPE_HEIGHT * height * 0.6})"> -->
+      <!--   <HistoricalData -->
+      <!--     {year} -->
+      <!--     {results} -->
+      <!--     width={width * 0.6} -->
+      <!--     height={TOP_PIPE_HEIGHT * height} -->
+      <!--   /> -->
+      <!-- </g> -->
 
       <g class="labels">
         {#if year !== 'none' && year !== 'historical'}
@@ -220,14 +226,6 @@
 <style>
   svg {
     background: #1B1023;
-  }
-
-  .links > path {
-    fill: none;
-    stroke-opacity: 1;
-    /* stroke: #9187a3; */
-    stroke: url(#linearSankey);
-    /* stroke: var(--background-colour); */
   }
 
   .wrapper {
