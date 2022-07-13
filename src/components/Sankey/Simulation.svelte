@@ -176,7 +176,6 @@
 <style lang="scss">
   :global(.scrollyteller .panel),
   :global(.scrollyteller .st-panel) {
-
     &::before {
       background: #C5B8DF;
       opacity: 0.75;
@@ -185,6 +184,7 @@
   }
 
   :global(.scrollyteller .sankey-panel) {
+    :global(p),
     :global(span) {
       color: white;
     }
