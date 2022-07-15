@@ -26,7 +26,7 @@
     }
 
     // Algorithmic Audits
-    if (name === 'forth') {
+    if (name === 'forth' && frame) {
       return true;
     }
 
@@ -41,6 +41,15 @@
     if (state.sankey) {
       sankeyYear = state.year;
       sankeyState = state.state;
+    }
+
+    if (
+      isSankeyFrame(scrollytellerName, frameMarker) ||
+      (scrollytellerName === 'third' && frameMarker)
+    ) {
+      setToDarkBackground();
+    } else {
+      setToLightBackground();
     }
   });
 
@@ -65,13 +74,6 @@
   // Start with light background
   setToLightBackground();
 
-  $: {
-    if (isSankeyFrame(scrollytellerName, frameMarker) || scrollytellerName === 'third') {
-      setToDarkBackground();
-    } else {
-      setToLightBackground();
-    }
-  }
   $: noiseOpacity = isSankeyFrame(scrollytellerName, frameMarker) ? '0.12' : '0.25';
 
   $: {
