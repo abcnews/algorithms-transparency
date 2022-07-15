@@ -28,6 +28,9 @@
       if (p?.data.sankey) {
         p.panelClass = `sankey-panel year-${p.data.year} state-${p.data.state || ''}`;
       }
+      if (p?.data.specialcolours) {
+        p.panelClass = 'special-colours';
+      }
 
       if (p.data.state === 'finished') {
         // Add the scorecard to the panels tagged with the "finished" state
@@ -45,8 +48,7 @@
         headerRow.append(blueParticle);
 
         const header = document.createElement('h6');
-        // TODO: Refusal rates?
-        header.innerText = 'ENFORCEMENT RATES';
+        header.innerText = 'REFUSAL RATES';
         headerRow.append(header);
 
         const redParticle = document.createElement('img');
@@ -174,15 +176,6 @@
 />
 
 <style lang="scss">
-  :global(.scrollyteller .panel),
-  :global(.scrollyteller .st-panel) {
-    &::before {
-      background: #C5B8DF;
-      opacity: 0.75;
-      box-shadow: none;
-    }
-  }
-
   :global(.scrollyteller .sankey-panel) {
     :global(p),
     :global(span) {
@@ -190,7 +183,7 @@
     }
 
     &::before {
-      background: #1B1023;
+      background-color: #1B1023 !important;
     }
   }
 
@@ -207,6 +200,7 @@
     :global(h6) {
       font-size: 1rem;
       color: white;
+      margin: 0 0 0.5em;
     }
 
     :global(.title) {

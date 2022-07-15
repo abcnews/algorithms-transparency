@@ -28,8 +28,6 @@
 
   export let state: string | null;
 
-  $: console.log(state);
-
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
   $: bandWidth = innerWidth / 4 - padding * 3;
@@ -118,6 +116,17 @@
     approvedCount1 = total.approved[1];
     rejectedCount0 = total.rejected[0];
     rejectedCount1 = total.rejected[1];
+  };
+
+  const linkLabelStyle = (state: string | null, name: string) => {
+    console.log(state, name);
+    if (state === 'highlighthigh' && name === 'high') {
+      return 'red';
+    }
+    if (state === 'highlightlow' && name === 'low') {
+      return 'green';
+    }
+    return '';
   };
 
   const GRADIENT_END = 0.8;
@@ -212,8 +221,8 @@
 
         {#each centeredLinks as link}
           <g transform="translate({link.y1}, {sankeyHeight + 5})" text-anchor="middle">
-            <text>
-              <tspan x="1" dy="1.2em" text-anchor="middle">{link.target.name}</tspan>
+          <text fill="{linkLabelStyle(state, link.target.name)}">
+              <tspan x="1" dy="1.2em" text-anchor="middle">{link.target.name === 'med' ? 'medium' : link.target.name}</tspan>
               <tspan x="0" dy="1.2em" text-anchor="middle">risk</tspan>
             </text>
           </g>
@@ -224,10 +233,6 @@
 </svg>
 
 <style>
-  svg {
-    background: #1B1023;
-  }
-
   .wrapper {
     fill: black;
   }

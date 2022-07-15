@@ -11,13 +11,8 @@ export const calcDist = (rate1: number, rate2: number): any => {
   const high = (1 / 3) * ratio;
   const low = 2 / 3 - high;
 
-  // // Leave medium-risk dist equal
-
-  // const high = rate1 * 0.7;
-  // const low = rate1 * 0.5;
-
+  // Leave medium-risk dist equal
   const med = 1 - high - low;
-  console.log({ ratio, high, med, low });
 
   return { low, med, high };
 };

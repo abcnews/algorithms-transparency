@@ -27,6 +27,14 @@
     }
     iframe.contentWindow.postMessage({ type: 'DOM', id, ...attrs }, '*');
   }
+
+  export function onFinish(cb: any) {
+    window.addEventListener('message', msg => {
+      if (msg.data.type === 'onfinish') {
+        cb(msg.data.frame);
+      }
+    }, { once: true });
+  }
 </script>
 
 <script lang="ts">

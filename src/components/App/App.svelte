@@ -3,6 +3,9 @@
   import AnimationController from '../AnimationController/AnimationController.svelte';
   import Simulation, { preprocessPanels } from '../Sankey/Simulation.svelte';
 
+  import { postprocessPanel } from '../../lib/panelModifications';
+  import { DARK_BG, PINK_BG } from '../../constants';
+
   export let scrollyData: any;
   export let name: string;
 
@@ -46,7 +49,29 @@
   let height: number;
   let simWidth: number;
 
-  $: backgroundColour = isSankeyFrame(scrollytellerName, frameMarker) ? '#1B1023' : '#c5b8df';
+  const setToLightBackground = () => {
+    const root = document.documentElement;
+    root.style.setProperty('--background-colour', PINK_BG);
+    root.style.setProperty('--text-colour', 'black');
+    root.style.setProperty('--link-colour', '#0073a8');
+  };
+  const setToDarkBackground = () => {
+    const root = document.documentElement;
+    root.style.setProperty('--background-colour', DARK_BG);
+    root.style.setProperty('--text-colour', 'white');
+    root.style.setProperty('--link-colour', '#d398ea');
+  };
+
+  // Start with light background
+  setToLightBackground();
+
+  $: {
+    if (isSankeyFrame(scrollytellerName, frameMarker) || scrollytellerName === 'third') {
+      setToDarkBackground();
+    } else {
+      setToLightBackground();
+    }
+  }
   $: noiseOpacity = isSankeyFrame(scrollytellerName, frameMarker) ? '0.12' : '0.25';
 
   $: {
@@ -66,8 +91,14 @@
 <Scrollyteller
   panels={preprocessPanels(scrollyData.panels)}
   onMarker={updateState}
+  {postprocessPanel}
 >
-<main bind:clientWidth={width} bind:clientHeight={height} class="graphic" style="--x-offset: -{xOffset}px; background: {backgroundColour}">
+<main
+  bind:clientWidth={width}
+  bind:clientHeight={height}
+  class="graphic"
+  style="--x-offset: -{xOffset}px;"
+>
 
     <div
       class="noise"
@@ -82,15 +113,12 @@
         height={height}
       />
     {:else}
-      <AnimationController {scrollytellerName} {frameMarker} />
+      <AnimationController {scrollytellerName} {frameMarker} onTransitionToDark={setToDarkBackground} />
     {/if}
   </main>
 </Scrollyteller>
 
 <style lang="scss">
-  :global(html) {
-    --background-colour: #c5b8df;
-  }
   :global(.Main, html) {
     background: var(--background-colour);
   }
@@ -98,6 +126,11 @@
     position: relative;
     height: 100vh;
     width: 100vw;
+    background: var(--background-colour);
+  }
+
+  :global(.Main > p, .Main > h2) {
+    color: var(--text-colour);
   }
 
   /* size and position the visuals based on the viewport height */
@@ -110,14 +143,20 @@
     /* We want to force 1:1 ratio, and lose the sides */
     width: 100vh;
     height: 100vh;
-    transform: translate(var(--x-offset), -45%);
+    transform: translate(var(--x-offset), -50%);
     max-width: 5000vw;
   }
 
+  :global(.graphic svg) {
+    margin-top: 10%;
+  }
+
   /* Move the graphic to the left and the text to the right on desktop */
+  /* BUT not for first scrollyteller */
   @media (min-width: 76rem) {
-    :global(.graphic iframe, .graphic svg) {
-      transform: translate(-50vw, -45%);
+    :global(.graphic iframe),
+    :global(.graphic svg) {
+      transform: translate(-50vw, -50%);
     }
 
     :global(.scrollyteller .st-panel),
@@ -141,23 +180,34 @@
     margin-bottom: 100vh;
   }
 
-  /* :global(.panel-text-highlight) { */
-  /*   margin: 0 0.05em; */
-  /*   border: 0.125rem solid transparent; */
-  /*   padding: 0 0.2em; */
-  /*   display: inline-block; */
-  /*   color: #fff; */
-  /*   font-style: normal; */
-  /*   font-weight: normal; */
-  /*   line-height: 1.25; */
-  /*   white-space: nowrap; */
-  /* } */
+  :global(.scrollyteller .panel),
+  :global(.scrollyteller .st-panel) {
+    &::before {
+      background-color: var(--background-colour) !important;
+      box-shadow: none !important;
+      opacity: 0.75;
+    }
 
-  /* :global(.scrollyteller .st-panel)::before, */
-  /* :global(.scrollyteller .panel)::before { */
-  /*   background: #c5b8df !important; */
-  /*   box-shadow: none; */
-  /*   opacity: 0.8; */
-  /* } */
+    :global(a) {
+      color: var(--link-colour) !important;
+    }
+
+    :global(p),
+    :global(span) {
+      color: var(--text-colour) !important;
+    }
+  }
+
+  :global(.panel-text-highlight) {
+    margin: 0 0.05em;
+    border: 0.125rem solid transparent;
+    padding: 0 0.2em;
+    display: inline-block;
+    color: #fff;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
 
 </style>

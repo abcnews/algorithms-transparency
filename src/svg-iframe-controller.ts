@@ -13,7 +13,7 @@ type MessageData = {
   payload: unknown;
 };
 
-window.addEventListener('message', (message: { data: MessageData }) => {
+window.addEventListener('message', (message: { data: MessageData, source: any, origin: string }) => {
   if (message.data.type === 'command') {
     const { method, args } = (message.data as any);
     window.KeyshapeJS[method].apply(null, args);
@@ -25,7 +25,6 @@ window.addEventListener('message', (message: { data: MessageData }) => {
     const { frames } = (message.data as any);
     const tl = window.KeyshapeJS.timelines()[0];
 
-
     const next = () => {
       const frame = frames.shift();
       if (!frame) {
@@ -34,7 +33,11 @@ window.addEventListener('message', (message: { data: MessageData }) => {
       tl.onfinish = null;
       const { start, end, loop } = frame;
 
-      console.log(start, end, loop);
+      // console.log(start, end, loop);
+
+      if (start === end) {
+        return tl.time(start).pause();
+      }
 
       // Don't call next as looping lasts forever
       if (loop) {
@@ -45,6 +48,10 @@ window.addEventListener('message', (message: { data: MessageData }) => {
       // If there's another frame afterwards set it to play "onfinish"
       if (frames.length > 0) {
         tl.onfinish = next;
+      } else {
+        tl.onfinish = () => {
+          message.source.postMessage({ type: 'onfinish', frame: end }, message.origin);
+        };
       }
 
       // Play through once

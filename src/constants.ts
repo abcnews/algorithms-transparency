@@ -45,3 +45,6 @@ export const LINE_CHART_COLOURS = {
   'United States': '#006B75',
   Nepal: '#E52A00',
 };
+
+export const PINK_BG = '#c5b8df';
+export const DARK_BG = '#1B1023';
