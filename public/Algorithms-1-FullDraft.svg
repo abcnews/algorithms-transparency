@@ -128,6 +128,4 @@ var tl=ks.animate("#Tower",[{p:'visibility',t:[5958,6000],v:['hidden','visible']
 if(document.location.search.substr(1).split('&').indexOf('global=paused')>=0)ks.globalPause();})(KeyshapeJS);
 ]]></script>
 
-<script xlink:href="./svg-iframe-controller.js"></script>
-
 </svg>

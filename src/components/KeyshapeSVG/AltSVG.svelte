@@ -33,7 +33,7 @@
     const basePath = path.split('/').slice(0, -1).join('/');
     images.forEach(image => {
       if (image.href.baseVal.startsWith('./')) {
-        image.setAttribute('href', `${basePath}/${image.href.baseVal.slice(2)}`);
+        image.setAttribute('xlink:href', `${basePath}/${image.href.baseVal.slice(2)}`);
       }
     });
 
