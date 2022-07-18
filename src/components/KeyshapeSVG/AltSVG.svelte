@@ -22,10 +22,8 @@
     }
   };
 
-  const regex = /ks\.animate.*ks\.globalPause\(\)/gs;
-
-  let animateFn;
-  const transform = (svg: any) => {
+  let animateFn: any;
+  const transform = (svg: SVGElement) => {
     //
     // Update relative URLs on image assets
     //
@@ -38,8 +36,26 @@
     });
 
     //
+    // Prefix all filter/gradient IDs to prevent clashes with other SVGs in the DOM
+    //
+    const prefix = (Math.random() + 1).toString(36).substring(7);
+    const defs = Array.from(svg.childNodes || []).find(n => n.nodeName === 'defs')?.childNodes;
+    Array.from(defs).forEach((def: Element) => {
+      const originalID = def.getAttribute('id');
+      const newID = `${prefix}-${originalID}`;
+      def.setAttribute('id', newID);
+
+      // TODO: Handle attributes other than fill
+      const elemsUsing = svg.querySelectorAll(`[fill="url(#${originalID})"]`);
+      Array.from(elemsUsing).forEach(elem => {
+        elem.setAttribute('fill', `url(#${newID})`);
+      });
+    });
+
+    //
     // Extract Keyshape JS code so we can call it in the svelte script
     //
+    const regex = /ks\.animate.*ks\.globalPause\(\)/gs;
     const found = svg.innerHTML.match(regex);
     // Insert extracted code into a function
     animateFn = new Function(`ks=window.KeyshapeJS; const tl = ${found}; return tl;`);

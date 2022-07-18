@@ -1,5 +1,4 @@
 <script lang="ts">
-  // import SVG, { animateMarkers, runCommand, pauseTimeline, onFinish } from '../KeyshapeSVG/KeyshapeSVG.svelte';
   import SVG from '../KeyshapeSVG/AltSVG.svelte';
   import { DARK_BG } from '../../constants';
 

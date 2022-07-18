@@ -106,31 +106,6 @@
       <text class="box-label" x={(xScale(2015) + xScale(2020)) / 2} y={20}>Algorithm in use</text>
     </g>
 
-    <g class="line">
-      <!-- lines -->
-      <path 
-        d="{ausPath(data)}"
-        fill="none"
-        stroke="{LINE_CHART_COLOURS.Australia}"
-      />
-      <path 
-        d="{usPath(data)}"
-        fill="none"
-        stroke="{LINE_CHART_COLOURS['United States']}"
-      />
-      <path 
-        d="{nepalPath(data)}"
-        fill="none"
-        stroke="{LINE_CHART_COLOURS.Nepal}"
-      />
-      <!-- <path  -->
-      <!--   d="{syriaPath(data)}" -->
-      <!--   fill="none" -->
-      <!--   stroke="{LINE_CHART_COLOURS.Syria}" -->
-      <!-- /> -->
-
-    </g>
-    
     <!-- y axis -->
     <g>
       <path class="axis" stroke="currentColor" transform="translate({0}, 0)" d="{yPath}" fill="none" />
@@ -163,6 +138,32 @@
           </text>
         </g>
       {/each}
+    </g>
+
+    <g class="line">
+      <!-- lines -->
+      <path 
+        d="{ausPath(data)}"
+        fill="none"
+        stroke="{LINE_CHART_COLOURS.Australia}"
+      />
+      <path 
+        d="{usPath(data)}"
+        fill="none"
+        stroke="{LINE_CHART_COLOURS['United States']}"
+      />
+      <path 
+        d="{nepalPath(data)}"
+        fill="none"
+        stroke="{LINE_CHART_COLOURS.Nepal}"
+      />
+      <!-- <path  -->
+      <!--   d="{syriaPath(data)}" -->
+      <!--   fill="none" -->
+      <!--   stroke="{LINE_CHART_COLOURS.Syria}" -->
+      <!-- /> -->
+    </g>
+    
   </svg>
 </div>
 
