@@ -25,7 +25,7 @@ export const postprocessPanel = (panel) => {
     // TODO: Check for boldness when data coming from CM?
     Object.keys(COLOUR_MAPPING).map(k => {
       if (text === k) {
-        (node as any).parentNode.style.backgroundColor = `${COLOUR_MAPPING[k]} !important`;
+        (node as any).parentNode.style.backgroundColor = COLOUR_MAPPING[k];
         (node as any).parentNode.classList.add('panel-text-highlight');
       }
     });

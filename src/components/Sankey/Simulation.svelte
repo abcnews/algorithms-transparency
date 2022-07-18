@@ -14,6 +14,7 @@
     '2015': runSimulation(2015),
     '2016': runSimulation(2016),
     '2017': runSimulation(2017),
+    'audit': {},
   };
 
   const path = __webpack_public_path__ || '/';
@@ -92,7 +93,7 @@
 
     const leftScore = document.createElement('span');
     leftScore.innerText = `${p1}%`;
-    leftScore.style = `color: ${BLUE.colour}`;
+    leftScore.style = `color: ${BLUE.colour} !important`;
     leftScore.classList.add('score');
     rowDiv.append(leftScore);
 
@@ -103,7 +104,7 @@
 
     const rightScore = document.createElement('span');
     rightScore.innerText = `${p2}%`;
-    rightScore.style = `color: ${RED.colour}`;
+    rightScore.style = `color: ${RED.colour} !important`;
     rightScore.classList.add('score');
     rowDiv.append(rightScore);
 
@@ -138,7 +139,7 @@
   // for each of the three sankey runs
   const panelPercentages = {};
   onMount(() => {
-    const subscribeToYear = (y: number) => {
+    const subscribeToYear = (y: string) => {
       subscribe(`sankey-${y}`, (message: any) => {
         if (!message.data) {
           return;
@@ -151,13 +152,14 @@
         if (progressPercentage > 100) {
           progressPercentage = 100;
         }
-        panelPercentages[String(y)] = progressPercentage;
+        panelPercentages[y] = progressPercentage;
       }, { indicatorSelector: `.sankey-panel.year-${y}.state-running` });
     }
 
-    subscribeToYear(2015);
-    subscribeToYear(2016);
-    subscribeToYear(2017);
+    subscribeToYear('2015');
+    subscribeToYear('2016');
+    subscribeToYear('2017');
+    subscribeToYear('audit');
   });
 
   export let width: number;

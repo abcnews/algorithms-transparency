@@ -1,12 +1,15 @@
 <script lang="ts">
-  import SVG, { animateMarkers, runCommand, pauseTimeline, onFinish } from '../KeyshapeSVG/KeyshapeSVG.svelte';
+  // import SVG, { animateMarkers, runCommand, pauseTimeline, onFinish } from '../KeyshapeSVG/KeyshapeSVG.svelte';
+  import SVG from '../KeyshapeSVG/AltSVG.svelte';
   import { DARK_BG } from '../../constants';
 
-  let iframeEl;
+  let svgComponent;
 
   export let frameMarker: string | null;
   export let scrollytellerName: string;
   export let onTransitionToDark: any;
+
+  let onFinishAnimation: any = null;
 
   let backgroundOverride: string | null = null;
   let currentMarkerState: string | null = null;
@@ -44,9 +47,10 @@
   $: absolutePath = __webpack_public_path__ || '/';
 
   const setAnimation = (currentState: string | null, nextFrame: string | null) => {
-    if (!nextFrame || currentState === nextFrame) {
+    if (!nextFrame || currentState === nextFrame || !svgComponent) {
       return;
     }
+    const animate = svgComponent.animate;
 
     // Set the current state variable for next time
     currentMarkerState = nextFrame;
@@ -58,11 +62,11 @@
     if (hasLoopFrame(scrollytellerName, nextFrame)) {
       // If scrolling up, just do the loop frame
       if (parseInt(currentState || '0') > parseInt(nextFrame)) {
-        return animateMarkers(iframeEl, [loopFrame]);
+        return animate([loopFrame]);
       }
 
       // Else, do the initial animation followed by the loop frame
-      return animateMarkers(iframeEl, [
+      return animate([
         initialFrameWithLoop,
         loopFrame
       ]);
@@ -70,10 +74,10 @@
 
     // If scrolling up, pause at the end state
     if (parseInt(currentState || '0') > parseInt(nextFrame)) {
-      return animateMarkers(iframeEl, [{ start: nextFrame, end: nextFrame, loop: false }]);
+      return animate([{ start: nextFrame, end: nextFrame, loop: false }]);
     }
 
-    onFinish((frame: string) => {
+    onFinishAnimation = (frame: string) => {
       if (scrollytellerName === 'second' && frame === '3') {
         if (onTransitionToDark) {
           onTransitionToDark();
@@ -81,14 +85,14 @@
 
         backgroundOverride = DARK_BG;
       }
-    });
+    };
 
     // The last frame just has a null end marker
     if (nextFrame === finalFrame) {
-      return animateMarkers(iframeEl, [{ start: nextFrame, loop: false }]);
+      return animate([{ start: nextFrame, loop: false }]);
     }
 
-    return animateMarkers(iframeEl, [initialFrameNoLoop]);
+    return animate([initialFrameNoLoop]);
   }
 
   $: {
@@ -104,10 +108,11 @@
 
 <SVG
   path={`${absolutePath}${svgPath}`}
-  bind:iframeEl={iframeEl}
+  bind:this={svgComponent}
+  onFinishAnimation={onFinishAnimation}
   onLoad={() => {
-    runCommand(iframeEl, 'globalPlay');
-    pauseTimeline(iframeEl);
+    // runCommand(iframeEl, 'globalPlay');
+    // pauseTimeline(iframeEl);
 
     setAnimation(null, frameMarker);
   }}

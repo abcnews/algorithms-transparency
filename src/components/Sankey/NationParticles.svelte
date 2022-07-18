@@ -14,12 +14,12 @@
     genRoutes,
   } from '../data';
 
-  export let padding;
-  export let psize;
-  export let speed;
+  export let padding: number;
+  export let psize: number;
+  export let speed: number;
 
-  export let onUpdateFinishedParticles;
-  export let bandWidth;
+  export let onUpdateFinishedParticles: any;
+  export let bandWidth: number;
   export let width: number;
   export let height: number;
   export let progressPercentage: number;
@@ -30,8 +30,6 @@
 
   $: nodes = genNodes(result.outcome);
   $: links = genLinks(result.outcome);
-
-  // $: console.log(Math.round(result.rejectionRate * 100));
 
   // Common data structure format that d3 uses to layout networks (e.g. d3-sankey, d3-force)
   $: dataForSankey = {

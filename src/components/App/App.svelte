@@ -25,8 +25,7 @@
       return true;
     }
 
-    // Algorithmic Audits
-    if (name === 'forth' && frame) {
+    if (name === 'fourth') {
       return true;
     }
 
@@ -34,6 +33,7 @@
   };
 
   let updateState = ((state: any) => {
+    const prevFrame = frameMarker;
     if (state.frame) {
       frameMarker = String(state.frame);
     }
@@ -43,9 +43,19 @@
       sankeyState = state.state;
     }
 
+    // Special case around the transition point
+    if (scrollytellerName === 'second' && frameMarker === '2') {
+      if (prevFrame === '3') {
+        setToLightBackground();
+      }
+      return;
+    }
+
+    // Otherwise, set the background to light vs dark based on progress through the scrollyteller
     if (
       isSankeyFrame(scrollytellerName, frameMarker) ||
-      (scrollytellerName === 'third' && frameMarker)
+      (scrollytellerName === 'third' && frameMarker) ||
+      (scrollytellerName === 'forth' && frameMarker)
     ) {
       setToDarkBackground();
     } else {

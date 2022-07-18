@@ -48,3 +48,13 @@ export const LINE_CHART_COLOURS = {
 
 export const PINK_BG = '#c5b8df';
 export const DARK_BG = '#1B1023';
+
+// TODO
+export const AUDIT_DATA = [
+  {
+    nation: BLUE,
+    rejectionRate: 0.22,
+    outcome: {
+    },
+  }
+];
