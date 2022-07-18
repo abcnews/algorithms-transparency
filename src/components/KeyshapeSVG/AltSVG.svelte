@@ -26,6 +26,20 @@
 
   let animateFn;
   const transform = (svg: any) => {
+    //
+    // Update relative URLs on image assets
+    //
+    const images = svg.querySelectorAll('image');
+    const basePath = path.split('/').slice(0, -1).join('/');
+    images.forEach(image => {
+      if (image.href.baseVal.startsWith('./')) {
+        image.setAttribute('href', `${basePath}/${image.href.baseVal.slice(2)}`);
+      }
+    });
+
+    //
+    // Extract Keyshape JS code so we can call it in the svelte script
+    //
     const found = svg.innerHTML.match(regex);
     // Insert extracted code into a function
     animateFn = new Function(`ks=window.KeyshapeJS; const tl = ${found}; return tl;`);
