@@ -40,10 +40,10 @@ export const REJECTION_RATES = {
 export const INITIAL_YEAR = 2015;
 
 export const LINE_CHART_COLOURS = {
-  Syria: '#00297E',
-  Australia: '#007BC7',
-  'United States': '#006B75',
-  Nepal: '#E52A00',
+  Syria: '#00CAE8',
+  Australia: '#0092ED',
+  'United States': '#AFD6FD',
+  Nepal: '#FF571A',
 };
 
 export const PINK_BG = '#c5b8df';

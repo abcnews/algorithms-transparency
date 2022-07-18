@@ -3,10 +3,10 @@
 </script>
 
 <div class="scatter-key">
-  <svg viewBox="0 0 20 20">
-    <circle stroke={LINE_CHART_COLOURS.Syria} fill={LINE_CHART_COLOURS.Syria} cx="10" cy="10" r="8"/>
-  </svg>
-  <span style={`color:${LINE_CHART_COLOURS.Syria}`}>Syria</span>
+  <!-- <svg viewBox="0 0 20 20"> -->
+  <!--   <circle stroke={LINE_CHART_COLOURS.Syria} fill={LINE_CHART_COLOURS.Syria} cx="10" cy="10" r="8"/> -->
+  <!-- </svg> -->
+  <!-- <span style={`color:${LINE_CHART_COLOURS.Syria}`}>Syria</span> -->
 
   <svg viewBox="0 0 20 20">
     <circle stroke={LINE_CHART_COLOURS.Australia} fill={LINE_CHART_COLOURS.Australia} cx="10" cy="10" r="8"/>

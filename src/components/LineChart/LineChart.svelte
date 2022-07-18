@@ -67,18 +67,20 @@
 	$: nepalPath = line()
 		.x((d) => xScale(d.year))
     .y((d) => yScale(d.Nepal));
-	$: syriaPath = line()
-		.x((d) => xScale(d.year))
-    .y((d) => yScale(d.Syria));
+	// $: syriaPath = line()
+	// 	.x((d) => xScale(d.year))
+  //   .y((d) => yScale(d.Syria));
 	
 	// ticks for x axis - every second year
 	const xTicks = range(2008, 2023, 2);
 	
 	// y ticks count to label by 10's
 	const yTicks = range(10, 101, 10);
+
+  const horizontalLine = (y: number, w: number) => `M0,${y}H${w}`
 	
 	// d's for axis paths
-	$: xPath = `M0,0H${innerWidth}`
+  $: xPath = horizontalLine(0, innerWidth) // `M0,0H${innerWidth}`
 	$: yPath = `M0,${innerHeight}H0.5V0.5H0`
 
 	$: algoStartPath = `M${xScale(2015)},${innerHeight}V0.5`
@@ -86,56 +88,22 @@
 
 </script>
 
-<style>
-	svg {
-		width: 100%;
-		height: 100%;
-    overflow: overlay;
-	}
-	.box {
-		font-size: 13px;
-    font-family: "ABCSans";
-    color: #69788C;
-    text-anchor: middle;
-  }
-	.tick {
-		font-size: 11px;
-    font-family: "ABCSans";
-    color: #69788C;
-  }
-	.tick.y {
-    text-anchor: end;
-	}
-	.tick.x {
-    text-anchor: middle;
-	}
-
-  .line {
-    stroke-width: 2px;
-  }
-
-  .svg-wrapper {
-		width: 100%;
-		height: 100%;
-  }
-</style>
-
 <Legend />
 
 <div class="svg-wrapper" bind:clientWidth={width} style="height:{height}px;">
   <svg bind:this={el} transform="translate({margin.left}, {margin.top})">
     <g class="box">
       <rect
-        fill="#EDF0F2"
+        fill="#24272B"
         x={xScale(2015)}
         y={0}
         width={xScale(2020) - xScale(2015)}
         height={innerHeight}
       />
       <!-- Algo markers -->
-      <path stroke="grey" d="{algoStartPath}" stroke-dasharray="4" fill="none" />
-      <path stroke="grey" d="{algoEndPath}" stroke-dasharray="4" fill="none" />
-      <text x={(xScale(2015) + xScale(2020)) / 2} y={20}>Algorithm in use</text>
+      <path stroke="#838FA0" d="{algoStartPath}" stroke-dasharray="4" fill="none" />
+      <path stroke="#838FA0" d="{algoEndPath}" stroke-dasharray="4" fill="none" />
+      <text class="box-label" x={(xScale(2015) + xScale(2020)) / 2} y={20}>Algorithm in use</text>
     </g>
 
     <g class="line">
@@ -155,19 +123,25 @@
         fill="none"
         stroke="{LINE_CHART_COLOURS.Nepal}"
       />
-      <path 
-        d="{syriaPath(data)}"
-        fill="none"
-        stroke="{LINE_CHART_COLOURS.Syria}"
-      />
+      <!-- <path  -->
+      <!--   d="{syriaPath(data)}" -->
+      <!--   fill="none" -->
+      <!--   stroke="{LINE_CHART_COLOURS.Syria}" -->
+      <!-- /> -->
 
     </g>
     
     <!-- y axis -->
     <g>
-      <path stroke="currentColor" transform="translate({0}, 0)" d="{yPath}" fill="none" />
+      <path class="axis" stroke="currentColor" transform="translate({0}, 0)" d="{yPath}" fill="none" />
 
       {#each yTicks as y} 
+
+        {#if y % 20 === 0}
+          <path class="grid" stroke="currentColor" d="{horizontalLine(yScale(y), innerWidth)}" fill="none" />
+        {/if}
+
+
         <g class="tick y" opacity="1" transform="translate({0},{yScale(y)})">
           <path stroke="currentColor" x2="5" />
           <text dy="0.32em" fill="currentColor" x="-2">
@@ -179,7 +153,7 @@
     
     <!-- x axis -->
     <g transform="translate(0, {innerHeight})">
-      <path stroke="currentColor" d="{xPath}" fill="none" />
+      <path class="axis" stroke="currentColor" d="{xPath}" fill="none" />
       
       {#each xTicks as x} 
         <g class="tick x" opacity="1" transform="translate({xScale(x)},0)">
@@ -191,3 +165,49 @@
       {/each}
   </svg>
 </div>
+
+<style lang="scss">
+	svg {
+		width: 100%;
+		height: 100%;
+    overflow: overlay;
+	}
+	.box {
+		font-size: 13px;
+    font-family: "ABCSans";
+    color: #838FA0;
+    text-anchor: middle;
+
+    .box-label {
+      fill: #838FA0;
+    }
+  }
+	.tick {
+		font-size: 11px;
+    font-family: "ABCSans";
+    color: #838FA0;
+  }
+	.tick.y {
+    text-anchor: end;
+	}
+	.tick.x {
+    text-anchor: middle;
+	}
+
+  .line {
+    stroke-width: 2px;
+  }
+
+  .svg-wrapper {
+		width: 100%;
+		height: 100%;
+  }
+
+  .grid {
+    color: #31363C;
+  }
+  .axis {
+    color: #838FA0;
+  }
+</style>
+
