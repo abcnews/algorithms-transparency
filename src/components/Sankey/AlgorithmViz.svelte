@@ -135,7 +135,7 @@
   $: stop2 = Math.round((100 - stop1) * GRADIENT_END);
 </script>
 
-<svg {width} {height} viewBox="0 0 {width} {height}">
+<svg class="algo-viz" {width} {height} viewBox="0 0 {width} {height}">
   <defs>
     <linearGradient id="linearSankey" x2="0" y2="1">
       <stop offset="0%"   stop-color="#8b81a3"/>
@@ -235,6 +235,10 @@
 <style>
   .wrapper {
     fill: black;
+  }
+
+  .algo-viz {
+    margin-top: 10%;
   }
 
   .labels {

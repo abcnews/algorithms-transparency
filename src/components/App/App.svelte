@@ -134,6 +134,11 @@
   :global(.Main, html) {
     background: var(--background-colour);
   }
+
+  :global(.FormatCredit > p > span) {
+    color: white;
+  }
+
   .graphic {
     position: relative;
     height: 100vh;
@@ -157,10 +162,6 @@
     height: 100vh;
     transform: translate(var(--x-offset), -50%);
     max-width: 5000vw;
-  }
-
-  :global(.graphic svg) {
-    margin-top: 10%;
   }
 
   /* Move the graphic to the left and the text to the right on desktop */
