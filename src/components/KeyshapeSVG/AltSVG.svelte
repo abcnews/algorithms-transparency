@@ -36,14 +36,19 @@
     });
 
     //
-    // Prefix all filter/gradient IDs to prevent clashes with other SVGs in the DOM
+    // Prefix all IDs to prevent clashes with other SVGs in the DOM
     //
     const prefix = (Math.random() + 1).toString(36).substring(7);
-    const defs = Array.from(svg.childNodes || []).find(n => n.nodeName === 'defs')?.childNodes;
-    Array.from(defs).forEach((def: Element) => {
-      const originalID = def.getAttribute('id');
+    const idMap: Record<string, string> = {};
+    const allObjectsWithIds = svg.querySelectorAll('[id]');
+    Array.from(allObjectsWithIds).forEach((elem: Element) => {
+      const originalID = elem.getAttribute('id');
+      if (!originalID) {
+        return;
+      }
       const newID = `${prefix}-${originalID}`;
-      def.setAttribute('id', newID);
+      elem.setAttribute('id', newID);
+      idMap[originalID] = newID;
 
       // TODO: Handle attributes other than fill
       const elemsUsing = svg.querySelectorAll(`[fill="url(#${originalID})"]`);
@@ -55,10 +60,20 @@
     //
     // Extract Keyshape JS code so we can call it in the svelte script
     //
+    // TODO: Clean this up - possible CSS vector?
     const regex = /ks\.animate.*ks\.globalPause\(\)/gs;
     const found = svg.innerHTML.match(regex);
-    // Insert extracted code into a function
-    animateFn = new Function(`ks=window.KeyshapeJS; const tl = ${found}; return tl;`);
+    if (found) {
+      let animationCode = found[0];
+
+      // Replace any prefixed IDs in the SVG
+      Object.keys(idMap).forEach(id => {
+        animationCode = animationCode.replace(id, idMap[id]);
+      });
+
+      // Insert extracted code into a function
+      animateFn = new Function(`ks=window.KeyshapeJS; const tl = ${animationCode}; return tl;`);
+    }
     return svg;
   };
 
