@@ -107,21 +107,3 @@ export const genLeaves = (sankey, targetsAbsolute) => {
       targets: targetsAbsolute.filter(t => t.name === n.name)
     }));
 };
-
-// Gets a list of the nodes from the root to a leaf and returns a path thru these nodes
-export const sankeyLinkCustom = (bandHeight, nodes) => {
-  const p = path();
-  const h = bandHeight // 2;
-  nodes.forEach((n, i) => {
-    if (i === 0) {
-      p.moveTo(n.x0, n.y0 + h);
-    }
-    p.lineTo(n.x1, n.y0 + h);
-    const nn = nodes[i + 1];
-    if (nn) {
-      const w = nn.x0 - n.x1;
-      p.bezierCurveTo(n.x1 + w / 2, n.y0 + h, n.x1 + w / 2, nn.y0 + h, nn.x0, nn.y0 + h);
-    }
-  });
-  return p.toString();
-};

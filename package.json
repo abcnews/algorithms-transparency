@@ -36,7 +36,6 @@
 		"jtfell-d3-sankey": "^0.12.5",
 		"jtfell-svelte-scrollyteller": "0.0.11",
 		"regenerator-runtime": "^0.13.9",
-		"svelte": "^3.48.0",
-		"svelte-inline-svg": "^1.1.3"
+		"svelte": "^3.48.0"
 	}
 }

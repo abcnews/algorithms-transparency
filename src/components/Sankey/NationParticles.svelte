@@ -12,7 +12,7 @@
     genTargets,
     genThresholds,
     genRoutes,
-  } from '../data';
+  } from './helpers';
 
   export let padding: number;
   export let psize: number;
@@ -27,6 +27,8 @@
 
   export let topHeightPercentage: number;
   export let sankeyHeightPercentage: number;
+
+  $: console.log(result);
 
   $: nodes = genNodes(result.outcome);
   $: links = genLinks(result.outcome);
@@ -67,6 +69,7 @@
   $: speedScale = scaleLinear().range([1, 1 + speed])
 
   $: positionScale = scaleLinear().domain([0, 100]).range([-1 * topHeightPercentage, sankeyHeightPercentage]);
+  $: console.log(result.nation);
 
   let topPath: SVGPathElement;
   let paths: SVGPathElement[] = [];

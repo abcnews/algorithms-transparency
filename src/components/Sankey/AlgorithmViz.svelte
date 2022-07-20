@@ -4,11 +4,11 @@
   import {
     genNodes,
     genLinks,
-  } from '../data';
+  } from './helpers';
 
   import NationParticles from './NationParticles.svelte';
   import Particle from './Particle.svelte';
-  // import HistoricalData from './HistoricalData.svelte';
+  import Scorecard from '../Scorecard/Scorecard.svelte';
 
   // const margin = { top: 0, bottom: 0, left: 0, right: 0 };
   // const margin = { top: 25, bottom: 25, left: 25, right: 25 };
@@ -17,16 +17,18 @@
   const psize = 4;
   const speed = 2;
 
-  const TOP_PIPE_HEIGHT = 0.1;
-  const SANKEY_HEIGHT = 0.25;
-
   export let width: number;
   export let height: number;
   export let progressPercentage: number;
   export let results: Record<string, any>;
   export let year: string;
-
   export let state: string | null;
+  export let showRefusals: boolean;
+  export let scorecardScores: any[];
+
+  // TODO: Move this down for scorecard?
+  const TOP_PIPE_HEIGHT = 0.1;
+  const SANKEY_HEIGHT = 0.25;
 
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
@@ -170,53 +172,53 @@
         height={sankeyHeight + topPipeHeight}
       />
 
-      {#each activeResults as result}
-        <NationParticles
-          width={innerWidth}
-          height={height}
-          topHeightPercentage={TOP_PIPE_HEIGHT}
-          sankeyHeightPercentage={SANKEY_HEIGHT}
-          {bandWidth}
-          {progressPercentage}
-          {result}
-          {psize}
-          {padding}
-          {speed}
-          {onUpdateFinishedParticles}
-        />
-      {/each}
+      {#if activeResults}
+        {#each activeResults as result}
+          <NationParticles
+            width={innerWidth}
+            height={height}
+            topHeightPercentage={TOP_PIPE_HEIGHT}
+            sankeyHeightPercentage={SANKEY_HEIGHT}
+            {bandWidth}
+            {progressPercentage}
+            {result}
+            {psize}
+            {padding}
+            {speed}
+            {onUpdateFinishedParticles}
+          />
+        {/each}
+      {/if}
 
-      <!-- <g transform="translate({width * 0.2}, {-1 * TOP_PIPE_HEIGHT * height * 0.6})"> -->
-      <!--   <HistoricalData -->
-      <!--     {year} -->
-      <!--     {results} -->
-      <!--     width={width * 0.6} -->
-      <!--     height={TOP_PIPE_HEIGHT * height} -->
-      <!--   /> -->
-      <!-- </g> -->
+      {#if scorecardScores.length}
+        <foreignObject x={0} y={-45} width={innerWidth} height={280}>
+          <Scorecard scores={scorecardScores} {state} />
+        </foreignObject>
+      {/if}
 
       <g class="labels">
-        {#if year !== 'none' && year !== 'historical'}
-          <g class="year-label" transform="translate({innerWidth / 2}, {(sankeyHeight / 2) * 0.90})" text-anchor="middle">
-            <text>{year}</text>
-          </g>
-        {/if}
+        {#if showRefusals}
+          {#if year !== 'none' && year !== 'historical'}
+            <g class="year-label" transform="translate({innerWidth / 2}, {(sankeyHeight / 2) * 0.90})" text-anchor="middle">
+              <text>{year}</text>
+            </g>
+          {/if}
 
-        {#if rejectedCount0 && rejectedCount1}
-          <g class="refusals-label" transform="translate({innerWidth / 2}, {sankeyHeight + 85})" text-anchor="middle">
-            <text>Refusals</text>
-          </g>
+          {#if rejectedCount0 && rejectedCount1}
+            <g class="refusals-label" transform="translate({innerWidth / 2}, {sankeyHeight + 85})" text-anchor="middle">
+              <text>Refusals</text>
+            </g>
 
-          <Particle x={80} y={sankeyHeight + 85 - 15} size={8} colour={activeResults[0].nation.colour} />
-          <g class="refusals-label" style="fill:{activeResults[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
-            <text>{Math.round(rejectedCount0 / (approvedCount0 + rejectedCount0) * 100) || 0}%</text>
-          </g>
+            <Particle x={80} y={sankeyHeight + 85 - 15} size={8} colour={activeResults[0].nation.colour} />
+            <g class="refusals-label" style="fill:{activeResults[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+              <text>{Math.round(rejectedCount0 / (approvedCount0 + rejectedCount0) * 100) || 0}%</text>
+            </g>
 
-          <Particle x={innerWidth - 82} y={sankeyHeight + 85 - 15} size={8} colour={activeResults[1].nation.colour} />
-          <g class="refusals-label" style="fill:{activeResults[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
-            <text>{Math.round(rejectedCount1 / (approvedCount1 + rejectedCount1) * 100) || 0}%</text>
-          </g>
-
+            <Particle x={innerWidth - 82} y={sankeyHeight + 85 - 15} size={8} colour={activeResults[1].nation.colour} />
+            <g class="refusals-label" style="fill:{activeResults[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+              <text>{Math.round(rejectedCount1 / (approvedCount1 + rejectedCount1) * 100) || 0}%</text>
+            </g>
+          {/if}
         {/if}
 
         {#each centeredLinks as link}

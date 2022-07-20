@@ -1,6 +1,8 @@
 <script context="module" lang="ts">
+  import { range } from 'd3';
   import { runSimulation } from '../../lib/model';
-  import { HISTORICAL_REJECTION_RATES, BLUE, RED } from '../../constants';
+  import { HISTORICAL_REJECTION_RATES, AUDIT_DATA } from '../../constants';
+  import Scorecard from '../Scorecard/Scorecard.svelte';
 
   // Run the simulation in the module context, then we can use it for both:
   // - injecting the scorecards into the panels
@@ -14,10 +16,8 @@
     '2015': runSimulation(2015),
     '2016': runSimulation(2016),
     '2017': runSimulation(2017),
-    'audit': {},
+    'audit': AUDIT_DATA,
   };
-
-  const path = __webpack_public_path__ || '/';
 
   //
   // Preprocess the panels to add classes to panels for progress tracking and inject the scorecards
@@ -34,97 +34,35 @@
       }
 
       if (p.data.state === 'finished') {
-        // Add the scorecard to the panels tagged with the "finished" state
         const scorecard = document.createElement('div');
-        scorecard.classList.add('sankey-scorecard');
-        
-        const headerRow = document.createElement('div');
-        headerRow.classList.add('row');
-
-        const blueParticle = document.createElement('img');
-        blueParticle.src = `${path}circle.svg`;
-        blueParticle.style = 'transform: translate(0, 15px)';
-        blueParticle.width = 22;
-        blueParticle.height = 22;
-        headerRow.append(blueParticle);
-
-        const header = document.createElement('h6');
-        header.innerText = 'REFUSAL RATES';
-        headerRow.append(header);
-
-        const redParticle = document.createElement('img');
-        redParticle.src = `${path}squarestar.svg`;
-        // Make up for weird shape of vector
-        redParticle.style = 'transform: translate(-6px, 15px)';
-        redParticle.width = 22;
-        redParticle.height = 19;
-        headerRow.append(redParticle);
-
-        scorecard.append(headerRow);
-
-        addScorecardRow(
-          scorecard,
-          'Historical',
-          HISTORICAL_REJECTION_RATES[0] * 100,
-          HISTORICAL_REJECTION_RATES[1] * 100
-        );
-
-        for (let year = 2015; year <= p.data.year; year++) {
-          const simulatedResult = results[year];
-          const p1 = Math.floor(simulatedResult[0].rejectionRate * 100);
-          const p2 = Math.floor(simulatedResult[1].rejectionRate * 100);
-          addScorecardRow(scorecard, String(year), p1, p2);
-        }
-
         p.nodes.push(scorecard);
+
+        const scores = range(2015, p.data.year + 1).map(y => {
+          const simulatedResult = results[y];
+          return {
+            label: String(y),
+            p1: Math.floor(simulatedResult[0].rejectionRate * 100),
+            p2: Math.floor(simulatedResult[1].rejectionRate * 100),
+          };
+        });
+
+        // Inject the svelte scorecard component into the panels
+        new Scorecard({
+          target: scorecard,
+          props: {
+            scores: [
+              {
+                label: 'Historical',
+                p1: HISTORICAL_REJECTION_RATES[0] * 100,
+                p2: HISTORICAL_REJECTION_RATES[1] * 100,
+              },
+              ...scores,
+            ]
+          }
+        });
       }
       return p;
     });
-  };
-
-  const addScorecardRow = (parent: HTMLElement, label: string, p1: number, p2: number) => {
-    const title = document.createElement('span');
-    title.classList.add('title');
-    title.innerText = label;
-    parent.append(title);
-
-    const rowDiv = document.createElement('div');
-    rowDiv.classList.add('row');
-
-    const leftScore = document.createElement('span');
-    leftScore.innerText = `${p1}%`;
-    leftScore.style = `color: ${BLUE.colour} !important`;
-    leftScore.classList.add('score');
-    rowDiv.append(leftScore);
-
-    const bars = document.createElement('div');
-    bars.classList.add('bar-wrapper');
-    addBarChart(bars, p1, p2);
-    rowDiv.append(bars);
-
-    const rightScore = document.createElement('span');
-    rightScore.innerText = `${p2}%`;
-    rightScore.style = `color: ${RED.colour} !important`;
-    rightScore.classList.add('score');
-    rowDiv.append(rightScore);
-
-    parent.append(rowDiv);
-  };
-
-  const addBarChart = (parent: HTMLElement, p1: number, p2: number) => {
-    const leftBar = document.createElement('div');
-    leftBar.classList.add('bar');
-    leftBar.innerHTML = `<div class="bar-inner" style="background: ${BLUE.colour}; width:${100 * p1 / 50}%; margin-left: auto;"></div>`;
-    parent.append(leftBar);
-
-    const middleLine = document.createElement('div');
-    middleLine.classList.add('middle-line');
-    parent.append(middleLine);
-    
-    const rightBar = document.createElement('div');
-    rightBar.classList.add('bar');
-    rightBar.innerHTML = `<div class="bar-inner" style="background: ${RED.colour}; width:${100 * p2 / 50}%"></div>`;
-    parent.append(rightBar);
   };
 
 </script>
@@ -132,6 +70,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { subscribe } from '@abcnews/progress-utils';
+  import { AUDIT_SCORECARD } from '../../constants';
 
   import AlgorithmViz from './AlgorithmViz.svelte';
 
@@ -166,16 +105,24 @@
   export let height: number;
   export let year: string;
   export let state: string | null;
+  export let showScorecard: boolean;
+
+  $: showRefusals = year !== 'audit';
+  $: scorecardScores = showScorecard ? AUDIT_SCORECARD : [];
 </script>
 
-<AlgorithmViz
-  {width}
-  {height}
-  {results}
-  {year}
-  {state}
-  progressPercentage={panelPercentages[year]}
-/>
+{#if width && height}
+  <AlgorithmViz
+    {width}
+    {height}
+    {results}
+    {year}
+    {state}
+    {showRefusals}
+    {scorecardScores}
+    progressPercentage={panelPercentages[year]}
+  />
+{/if}
 
 <style lang="scss">
   :global(.scrollyteller .sankey-panel) {

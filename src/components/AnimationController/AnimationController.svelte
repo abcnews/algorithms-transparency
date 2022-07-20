@@ -1,5 +1,5 @@
 <script lang="ts">
-  import SVG from '../KeyshapeSVG/AltSVG.svelte';
+  import SVG from '../KeyshapeSVG/KeyshapeSVG.svelte';
   import { DARK_BG } from '../../constants';
 
   let svgComponent;

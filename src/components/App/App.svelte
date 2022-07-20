@@ -18,6 +18,7 @@
   let sankeyYear: string = '2015';
   // running, finished, updated
   let sankeyState: string | null = null;
+  let sankeyScorecard: boolean = false;
 
   const isSankeyFrame = (name: string, frame: string | null) => {
     // UK Visa Processing
@@ -39,8 +40,10 @@
     }
 
     if (state.sankey) {
+      console.log(state);
       sankeyYear = state.year;
       sankeyState = state.state;
+      sankeyScorecard = !!state.scorecard;
     }
 
     // Special case around the transition point
@@ -123,6 +126,7 @@
         state={sankeyState}
         width={simWidth}
         height={height}
+        showScorecard={sankeyScorecard}
       />
     {:else}
       <AnimationController {scrollytellerName} {frameMarker} onTransitionToDark={setToDarkBackground} />

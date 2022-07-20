@@ -1,70 +1,126 @@
-<script context="module" lang="ts">
-  // Methods that are interpreted inside the iframe. See `svg-iframe-controller.ts`.
-  export function runCommand(iframe: HTMLIFrameElement, method: string, args = []) {
-    if (!iframe?.contentWindow) {
-      return;
-    }
-    iframe.contentWindow.postMessage({ type: 'command', method, args }, '*');
-  }
-
-  export function animateMarkers(iframe: HTMLIFrameElement, frames: any[]) {
-    if (!iframe?.contentWindow) {
-      return;
-    }
-    iframe.contentWindow.postMessage({ type: 'marker', frames }, '*');
-  }
-
-  export function pauseTimeline(iframe: HTMLIFrameElement) {
-    if (!iframe?.contentWindow) {
-      return;
-    }
-    iframe.contentWindow.postMessage({ type: 'tl-pause' }, '*');
-  }
-
-  export function manipulateDom(iframe: HTMLIFrameElement, id: string, attrs = {}) {
-    if (!iframe?.contentWindow) {
-      return;
-    }
-    iframe.contentWindow.postMessage({ type: 'DOM', id, ...attrs }, '*');
-  }
-
-  export function onFinish(cb: any) {
-    window.addEventListener('message', msg => {
-      if (msg.data.type === 'onfinish') {
-        cb(msg.data.frame);
-      }
-    }, { once: true });
-  }
-</script>
-
 <script lang="ts">
-  // Allow parent to bind to this element
-  export let iframeEl: HTMLIFrameElement;
+  import './keyshapejs-1.2.0.min.js';
+  import InlineSVG from './InlineSVG.svelte';
+
   // Path of SVG asset
   export let path: string;
+
   // Callback for parent
   export let onLoad: any;
+  export let onFinishAnimation: any;
 
+  let timeline: any = null;
+  const onLoadCb = () => {
+    timeline = animateFn();
+    timeline?.pause();
 
-  // let isIFrameReady: boolean = false;
-  const onIframeLoad = () => {
-    // isIFrameReady = true;
     if (onLoad) {
-      onLoad(iframeEl);
+      onLoad();
     }
   };
 
-  // detect and handle iOS devices and serve alternate svg
-  // const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  // const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  // $: finalPath = `${path.replace('.svg', '')}${IS_SAFARI || IS_IOS ? '__safari' : ''}.svg`;
+  let animateFn: any;
+  const transform = (svg: SVGElement) => {
+    //
+    // Update relative URLs on image assets
+    //
+    const images = svg.querySelectorAll('image');
+    const basePath = path.split('/').slice(0, -1).join('/');
+    images.forEach(image => {
+      if (image.href.baseVal.startsWith('./')) {
+        image.setAttribute('xlink:href', `${basePath}/${image.href.baseVal.slice(2)}`);
+      }
+    });
+
+    //
+    // Prefix all IDs to prevent clashes with other SVGs in the DOM
+    //
+    const prefix = (Math.random() + 1).toString(36).substring(7);
+    const idMap: Record<string, string> = {};
+    const allObjectsWithIds = svg.querySelectorAll('[id]');
+    Array.from(allObjectsWithIds).forEach((elem: Element) => {
+      const originalID = elem.getAttribute('id');
+      if (!originalID) {
+        return;
+      }
+      const newID = `${prefix}-${originalID}`;
+      elem.setAttribute('id', newID);
+      idMap[originalID] = newID;
+
+      // TODO: Handle attributes other than fill
+      const elemsUsing = svg.querySelectorAll(`[fill="url(#${originalID})"]`);
+      Array.from(elemsUsing).forEach(elem => {
+        elem.setAttribute('fill', `url(#${newID})`);
+      });
+    });
+
+    //
+    // Extract Keyshape JS code so we can call it in the svelte script
+    //
+    // TODO: Clean this up - possible CSS vector?
+    const regex = /ks\.animate.*ks\.globalPause\(\)/gs;
+    const found = svg.innerHTML.match(regex);
+    if (found) {
+      let animationCode = found[0];
+
+      // Replace any prefixed IDs in the SVG
+      Object.keys(idMap).forEach(id => {
+        animationCode = animationCode.replace(id, idMap[id]);
+      });
+
+      // Insert extracted code into a function
+      animateFn = new Function(`ks=window.KeyshapeJS; const tl = ${animationCode}; return tl;`);
+    }
+    return svg;
+  };
+
+  export function animate(frames: any[]) {
+    if (!timeline) {
+      return;
+    }
+
+    const next = () => {
+      const frame = frames.shift();
+      if (!frame) {
+        return;
+      }
+      timeline.onfinish = null;
+      const { start, end, loop } = frame;
+
+      // console.log(start, end, loop);
+
+      if (start === end) {
+        return timeline.time(start).pause();
+      }
+
+      // Don't call next as looping lasts forever
+      if (loop) {
+        timeline.range(start, end || timeline.duration()).loop(true);
+        return timeline.play(start);
+      }
+
+      // If there's another frame afterwards set it to play "onfinish"
+      if (frames.length > 0) {
+        timeline.onfinish = next;
+      } else {
+        timeline.onfinish = () => {
+          if (onFinishAnimation) {
+            onFinishAnimation(end);
+          }
+        };
+      }
+
+      // Play through once
+      timeline.range(timeline.time(), end || timeline.duration()).loop(0);
+      return timeline.play(timeline.time());
+    };
+
+    return next();
+  }
 </script>
 
-<iframe
-  bind:this={iframeEl}
-  title="Graphic"
-  frameBorder="0"
-  scrolling="no"
+<InlineSVG
   src={`${path}?global=paused`}
-  on:load={onIframeLoad}
+  transformSrc={transform}
+  on:loaded={onLoadCb}
 />
