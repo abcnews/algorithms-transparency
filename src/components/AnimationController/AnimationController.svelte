@@ -14,14 +14,14 @@
   let currentMarkerState: string | null = null;
 
   const FINAL_FRAME = {
-    first: '5',
+    first: '6',
     second: '3',
     third: '6',
   };
   $: finalFrame = FINAL_FRAME[scrollytellerName];
 
   const SVGS = {
-    first: 'Algorithms-1-FullDraft.svg',
+    first: 'Algorithms_Part1.svg',
     second: 'Algorithms_Part2.svg',
     third: 'Algorithms_Part3.svg',
   };
@@ -29,9 +29,10 @@
 
   const hasLoopFrame = (scrollytellerName: string, frameMarker: string | null) => {
     if (scrollytellerName === 'first') {
-      if (frameMarker === '4' || frameMarker === '5') {
-        return false;
+      if (frameMarker === '6') {
+        return true;
       }
+      return false;
     }
     if (scrollytellerName === 'second') {
       return false;
@@ -62,6 +63,13 @@
       // If scrolling up, just do the loop frame
       if (parseInt(currentState || '0') > parseInt(nextFrame)) {
         return animate([loopFrame]);
+      }
+
+      if (nextFrame === finalFrame) {
+        return animate([
+          initialFrameWithLoop,
+          { ...loopFrame, end: null }
+        ]);
       }
 
       // Else, do the initial animation followed by the loop frame

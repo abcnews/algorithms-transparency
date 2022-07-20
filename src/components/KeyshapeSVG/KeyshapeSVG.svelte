@@ -47,17 +47,28 @@
       elem.setAttribute('id', newID);
       idMap[originalID] = newID;
 
-      // TODO: Handle attributes other than fill
-      const elemsUsing = svg.querySelectorAll(`[fill="url(#${originalID})"]`);
-      Array.from(elemsUsing).forEach(elem => {
-        elem.setAttribute('fill', `url(#${newID})`);
+      const DATA_ATTRS = ['fill', 'stroke', 'mask'];
+      DATA_ATTRS.forEach(attr => {
+        const elemsUsing = svg.querySelectorAll(`[${attr}="url(#${originalID})"]`);
+        Array.from(elemsUsing).forEach(elem => {
+          elem.setAttribute(attr, `url(#${newID})`);
+        });
+      });
+
+      const XLINK_ATTRS = ['href'];
+      XLINK_ATTRS.forEach(attr => {
+        const elemsUsing = svg.querySelectorAll(`[*|${attr}="#${originalID}"]`);
+        console.log(elemsUsing);
+        Array.from(elemsUsing).forEach(elem => {
+          elem.setAttribute(`xlink:${attr}`, `#${newID}`);
+        });
       });
     });
 
     //
     // Extract Keyshape JS code so we can call it in the svelte script
     //
-    // TODO: Clean this up - possible CSS vector?
+    // TODO: Clean this up - possible XSS vector?
     const regex = /ks\.animate.*ks\.globalPause\(\)/gs;
     const found = svg.innerHTML.match(regex);
     if (found) {
@@ -65,7 +76,7 @@
 
       // Replace any prefixed IDs in the SVG
       Object.keys(idMap).forEach(id => {
-        animationCode = animationCode.replace(id, idMap[id]);
+        animationCode = animationCode.replace(`"#${id}"`, `"#${idMap[id]}"`);
       });
 
       // Insert extracted code into a function

@@ -150,6 +150,12 @@
     background: var(--background-colour);
   }
 
+  .noise {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+  }
+
   :global(.Main > p, .Main > h2) {
     color: var(--text-colour);
   }
