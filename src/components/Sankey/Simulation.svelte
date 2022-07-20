@@ -50,6 +50,7 @@
         new Scorecard({
           target: scorecard,
           props: {
+            state: 'running',
             scores: [
               {
                 label: 'Historical',

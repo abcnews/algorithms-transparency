@@ -154,6 +154,7 @@
     position: absolute;
     height: 100vh;
     width: 100vw;
+    z-index: 2;
   }
 
   :global(.Main > p, .Main > h2) {
