@@ -20,13 +20,13 @@
   let sankeyState: string | null = null;
   let sankeyScorecard: boolean = false;
 
-  const isDarkBackground = (name: string, frame: string | null) => {
+  const isDarkBackground = (name: string, frame: string | null): boolean => {
     return isSankeyFrame(name, frame) ||
-      (name === 'third' && frame) ||
-      (name === 'forth' && frame);
+      (name === 'third' && !!frame) ||
+      (name === 'forth' && !!frame);
   };
 
-  const isSankeyFrame = (name: string, frame: string | null) => {
+  const isSankeyFrame = (name: string, frame: string | null): boolean => {
     // UK Visa Processing
     if (name === 'second' && frame === '3') {
       return true;
@@ -46,7 +46,6 @@
     }
 
     if (state.sankey) {
-      console.log(state);
       sankeyYear = state.year;
       sankeyState = state.state;
       sankeyScorecard = !!state.scorecard;
@@ -72,24 +71,29 @@
   let width: number;
   let height: number;
   let simWidth: number;
+  let darkBackground: boolean = false;
 
+  const root = document.documentElement;
   const setToLightBackground = () => {
-    const root = document.documentElement;
+    darkBackground = false;
     root.style.setProperty('--background-colour', PINK_BG);
     root.style.setProperty('--text-colour', 'black');
     root.style.setProperty('--link-colour', '#0073a8');
+    root.style.setProperty('--noise-opacity', '0.25');
   };
   const setToDarkBackground = () => {
-    const root = document.documentElement;
+    darkBackground = true;
     root.style.setProperty('--background-colour', DARK_BG);
     root.style.setProperty('--text-colour', 'white');
     root.style.setProperty('--link-colour', '#d398ea');
+    root.style.setProperty('--noise-opacity', '0.12');
   };
+  $: absolutePath = __webpack_public_path__ || '/';
+  $: root.style.setProperty('--noise-url', `url(${absolutePath}Noise.png)`);
 
   // Start with light background
   setToLightBackground();
 
-  $: noiseOpacity = isDarkBackground(scrollytellerName, frameMarker) ? '0.12' : '0.25';
   $: simWidth = Math.min(500, width);
 
   // Centre the iframe on small screens
@@ -99,8 +103,15 @@
     const w = width - scrollbarWidth;
     xOffset = w/2 - (w - height) / 2 + scrollbarWidth / 2;
   }
-  $: absolutePath = __webpack_public_path__ || '/';
 </script>
+
+<!-- We only want 1 of these -->
+{#if scrollytellerName === 'first'}
+  <div
+    class="noise"
+    style="background-image: var(--noise-url); opacity: var(--noise-opacity);"
+  />
+{/if}
 
 <Scrollyteller
   panels={preprocessPanels(scrollyData.panels)}
@@ -113,10 +124,6 @@
   class="graphic"
   style="--x-offset: -{xOffset}px;"
 >
-    <div
-      class="noise"
-      style="background-image: url({absolutePath}Noise.png); opacity: {noiseOpacity};"
-    />
 
     {#if isSankeyFrame(scrollytellerName, frameMarker)}
       <Simulation
@@ -127,6 +134,9 @@
         showScorecard={sankeyScorecard}
       />
     {:else}
+      {#if darkBackground && scrollytellerName === 'second'}
+        <div class="background-cover" />
+      {/if}
       <AnimationController
         {scrollytellerName}
         {frameMarker}
@@ -153,10 +163,20 @@
   }
 
   .noise {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+
+  .background-cover {
+    background: var(--background-colour);
     position: absolute;
     height: 100vh;
     width: 100vw;
-    z-index: 2;
+    z-index: 5000;
   }
 
   :global(.Main > p, .Main > h2) {
@@ -189,6 +209,21 @@
       margin-left: 55vw !important;
       max-width: 40vw !important;
     }
+
+    /* Keep the first scrollyteller centered */
+    :global(#scrollytellerNAMEfirstFRAME1) {
+      :global(.graphic iframe),
+      :global(.graphic svg) {
+        transform: translate(var(--x-offset), -50%);
+      }
+
+      :global(.scrollyteller .st-panel),
+      :global(.scrollyteller .panel) {
+        margin-left: auto !important;
+        max-width: none !important;
+        text-align: center;
+      }
+    }
   }
 
   /* 
@@ -211,6 +246,7 @@
   :global(.scrollyteller .st-panel) {
     &::before {
       background-color: var(--background-colour) !important;
+      /* background-image: var(--noise-url); */
       box-shadow: none !important;
       opacity: 0.75;
     }

@@ -1,16 +1,13 @@
 <script lang="ts">
   import SVG from '../KeyshapeSVG/KeyshapeSVG.svelte';
-  import { DARK_BG } from '../../constants';
 
-  let svgComponent;
+  let svgComponent: any;
 
   export let frameMarker: string | null;
   export let scrollytellerName: string;
   export let onTransitionToDark: any;
 
   let onFinishAnimation: any = null;
-
-  let backgroundOverride: string | null = null;
   let currentMarkerState: string | null = null;
 
   const FINAL_FRAME = {
@@ -89,8 +86,6 @@
         if (onTransitionToDark) {
           onTransitionToDark();
         }
-
-        backgroundOverride = DARK_BG;
       }
     };
 
@@ -102,36 +97,14 @@
     return animate([initialFrameNoLoop]);
   }
 
-  $: {
-    // Turn off dark background when they reach the first frame
-    if (scrollytellerName === 'second' && frameMarker === '1') {
-      backgroundOverride = null;
-    }
-  }
-
 </script>
-
-<div class="background-cover" style="background-color: {backgroundOverride}" />
 
 <SVG
   path={`${absolutePath}${svgPath}`}
   bind:this={svgComponent}
   onFinishAnimation={onFinishAnimation}
   onLoad={() => {
-    // runCommand(iframeEl, 'globalPlay');
-    // pauseTimeline(iframeEl);
-
     setAnimation(null, frameMarker);
   }}
 />
 
-<style>
-  .background-cover {
-    height: 100vh;
-    width: 100vw;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 5000;
-  }
-</style>

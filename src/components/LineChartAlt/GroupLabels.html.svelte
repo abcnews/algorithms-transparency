@@ -24,9 +24,8 @@
     // TODO: Avoid other labels!
     // - use 2nd last value to decide ties
     // - set a minimum similarity between values to avoid overlap
-    console.log(label, finalValuePercent);
     if (label === 'United States') {
-      return finalValuePercent + 0.15;
+      return finalValuePercent + 0.11;
     }
     return finalValuePercent;
   }
