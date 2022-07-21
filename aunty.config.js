@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const includedDependencies = [/carbon-/, /jtfell-/];
+const includedDependencies = [/carbon-/, /layercake/, /jtfell-/];
 const getLoaderDefinition = (config, testSourceMatch, loaderMatch) =>
   config.module.rules
     .find(({ test }) => test.source.indexOf(testSourceMatch) > -1)

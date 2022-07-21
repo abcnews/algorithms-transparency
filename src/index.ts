@@ -4,7 +4,7 @@ import { getMountValue, selectMounts } from '@abcnews/mount-utils';
 import { loadScrollyteller } from 'jtfell-svelte-scrollyteller';
 
 import App from './components/App/App.svelte';
-import LineChart from './components/LineChart/LineChart.svelte';
+import LineChart from './components/LineChartAlt/LineChart.svelte';
 
 let appMounts: any[] = [];
 let appMountChart;
@@ -38,6 +38,7 @@ whenOdysseyLoaded.then(() => {
   const mounts = selectMounts('linechart');
   appMountChart = mounts[0];
   if (appMountChart) {
+    appMountChart.style = 'height: 300px; margin-top: 75px;';
     new LineChart({
       target: appMountChart,
       props: {}

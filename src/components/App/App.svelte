@@ -20,6 +20,12 @@
   let sankeyState: string | null = null;
   let sankeyScorecard: boolean = false;
 
+  const isDarkBackground = (name: string, frame: string | null) => {
+    return isSankeyFrame(name, frame) ||
+      (name === 'third' && frame) ||
+      (name === 'forth' && frame);
+  };
+
   const isSankeyFrame = (name: string, frame: string | null) => {
     // UK Visa Processing
     if (name === 'second' && frame === '3') {
@@ -54,12 +60,8 @@
       return;
     }
 
-    // Otherwise, set the background to light vs dark based on progress through the scrollyteller
-    if (
-      isSankeyFrame(scrollytellerName, frameMarker) ||
-      (scrollytellerName === 'third' && frameMarker) ||
-      (scrollytellerName === 'forth' && frameMarker)
-    ) {
+    // Otherwise, set the background to light vs dark based on progress through the story
+    if (isDarkBackground(scrollytellerName, frameMarker)) {
       setToDarkBackground();
     } else {
       setToLightBackground();
@@ -87,11 +89,8 @@
   // Start with light background
   setToLightBackground();
 
-  $: noiseOpacity = isSankeyFrame(scrollytellerName, frameMarker) ? '0.12' : '0.25';
-
-  $: {
-    simWidth = Math.min(400, width);
-  }
+  $: noiseOpacity = isDarkBackground(scrollytellerName, frameMarker) ? '0.12' : '0.25';
+  $: simWidth = Math.min(500, width);
 
   // Centre the iframe on small screens
   let xOffset: number;
@@ -114,7 +113,6 @@
   class="graphic"
   style="--x-offset: -{xOffset}px;"
 >
-
     <div
       class="noise"
       style="background-image: url({absolutePath}Noise.png); opacity: {noiseOpacity};"
@@ -129,7 +127,11 @@
         showScorecard={sankeyScorecard}
       />
     {:else}
-      <AnimationController {scrollytellerName} {frameMarker} onTransitionToDark={setToDarkBackground} />
+      <AnimationController
+        {scrollytellerName}
+        {frameMarker}
+        onTransitionToDark={setToDarkBackground}
+      />
     {/if}
   </main>
 </Scrollyteller>
@@ -176,7 +178,6 @@
   }
 
   /* Move the graphic to the left and the text to the right on desktop */
-  /* BUT not for first scrollyteller */
   @media (min-width: 76rem) {
     :global(.graphic iframe),
     :global(.graphic svg) {
@@ -190,7 +191,9 @@
     }
   }
 
-  /* Get the transition into the title right */
+  /* 
+     The end of the first scrollyteller needs to land just on top of the title
+   */
   :global(#scrollytellerNAMEfirstFRAME1) {
     margin-bottom: -53vh;
   }
@@ -198,12 +201,12 @@
     z-index: 100;
     position: relative;
   }
-
   :global(#scrollytellerNAMEfirstFRAME1 .st-panel):last-child ,
   :global(#scrollytellerNAMEfirstFRAME1 .panel):last-child {
     margin-bottom: 100vh;
   }
 
+  /* Allow the panels to be coloured based on light vs dark background setting */
   :global(.scrollyteller .panel),
   :global(.scrollyteller .st-panel) {
     &::before {
@@ -222,6 +225,10 @@
     }
   }
 
+  /* 
+     This class is added to 'Red' and 'Blue' mentions in the scrollyteller panels
+     during the sankey section
+   */
   :global(.panel-text-highlight) {
     margin: 0 0.05em;
     border: 0.125rem solid transparent;
