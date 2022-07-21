@@ -146,7 +146,7 @@
   const formatTickY = (d: number): string => `${d}%`; // format(`.${precisionFixed(d)}`)(d);
 
   let width: number;
-  $: numTicksX = Math.min(width / 40, dataLong[0].values.length);
+  $: numTicksX = Math.min(width / 50, dataLong[0].values.length);
 </script>
 
 <style>
@@ -157,17 +157,40 @@
     expand to fill it.
   */
   .chart-container {
-    height: 100%;
-    min-height: 200px;
+    height: 300px;
+    width: 100%;
     font-family: "ABCSans";
     margin: 0.5rem;
   }
 
+   @media (min-width: 76rem) {
+    .chart-container {
+       height: 400px;
+     }
+   }
 
   .chart-container :global(svg) {
     z-index: 5;
   }
+
+  .title {
+    font-family: "ABCSans";
+    color: white;
+  }
+
+  .source {
+    font-family: "ABCSans";
+    color: white;
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 400;
+    justify-content: space-between;
+    line-height: 18px;
+    text-decoration: none;
+  }
 </style>
+
+<h2 class="title">UK visa approval rates by country</h2>
 
 <div class="chart-container" bind:clientWidth={width}>
   <LayerCake
@@ -210,3 +233,5 @@
     </Html>
   </LayerCake>
 </div>
+
+<p class="source">Source: UK Home Office</p>

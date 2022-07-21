@@ -38,7 +38,7 @@ whenOdysseyLoaded.then(() => {
   const mounts = selectMounts('linechart');
   appMountChart = mounts[0];
   if (appMountChart) {
-    appMountChart.style = 'height: 300px; margin-top: 75px;';
+    appMountChart.style = 'padding-left: 15px;padding-right: 15px';
     new LineChart({
       target: appMountChart,
       props: {}
