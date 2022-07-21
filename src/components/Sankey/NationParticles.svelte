@@ -28,8 +28,6 @@
   export let topHeightPercentage: number;
   export let sankeyHeightPercentage: number;
 
-  $: console.log(result);
-
   $: nodes = genNodes(result.outcome);
   $: links = genLinks(result.outcome);
 
@@ -97,6 +95,7 @@
 
   // Initial state of particles
   $: particles = range(result.nation.numberOfApplicants).map(id => {
+    console.log(width);
     const target = targetScale(id / 100);
     return {
       id,
