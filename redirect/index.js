@@ -1,1 +1,1 @@
-window.location = String(window.location).replace('/latest/', '/1.0.28/')
+window.location = String(window.location).replace('/latest/', '/1.0.29/')
