@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Scrollyteller from 'jtfell-svelte-scrollyteller';
+  import Scrollyteller from '../../lib/components/Scrollyteller';
+  // import Scrollyteller from '@abcnews/svelte-components/components/Scrollyteller/Scrollyteller.svelte';
   import AnimationController from '../AnimationController/AnimationController.svelte';
   import Simulation, { preprocessPanels } from '../Sankey/Simulation.svelte';
 
@@ -96,7 +97,7 @@
 
   $: simWidth = Math.min(500, width);
 
-  // Centre the iframe on small screens
+  // Centre the animation frame on small screens
   let xOffset: number;
   $: {
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -117,14 +118,18 @@
   panels={preprocessPanels(scrollyData.panels)}
   onMarker={updateState}
   {postprocessPanel}
->
-<main
-  bind:clientWidth={width}
-  bind:clientHeight={height}
-  class="graphic"
-  style="--x-offset: -{xOffset}px;"
+  useScrollout={scrollytellerName !== 'first'}
+  backgroundColour={darkBackground ? DARK_BG : PINK_BG}
 >
 
+  <main
+    bind:clientWidth={width}
+    bind:clientHeight={height}
+    class="graphic"
+    style="
+      --x-offset: -{xOffset}px;
+    "
+  >
     {#if isSankeyFrame(scrollytellerName, frameMarker)}
       <Simulation
         year={sankeyYear}
@@ -155,6 +160,17 @@
     color: white;
   }
 
+  :global(.Main.u-layout > h2) {
+    position: relative;
+    z-index: 100;
+  }
+
+  :global(.ImageEmbed.u-pull) {
+    color: var(--text-colour);
+    position: relative;
+    z-index: 100;
+  }
+
   .graphic {
     position: relative;
     height: 100vh;
@@ -168,7 +184,7 @@
     width: 100vw;
     top: 0;
     left: 0;
-    z-index: 2;
+    z-index: 3;
   }
 
   .background-cover {
@@ -184,7 +200,7 @@
   }
 
   /* size and position the visuals based on the viewport height */
-  :global(.graphic iframe, .graphic svg) {
+  :global(.graphic svg) {
     /* https://jonathannicol.com/blog/2014/06/16/centre-crop-thumbnails-with-css/ */
     position: absolute;
     left: 50%;
@@ -199,7 +215,6 @@
 
   /* Move the graphic to the left and the text to the right on desktop */
   @media (min-width: 76rem) {
-    :global(.graphic iframe),
     :global(.graphic svg) {
       transform: translate(-50vw, -50%);
     }
@@ -212,7 +227,6 @@
 
     /* Keep the first scrollyteller centered */
     :global(#scrollytellerNAMEfirstFRAME1) {
-      :global(.graphic iframe),
       :global(.graphic svg) {
         transform: translate(var(--x-offset), -50%);
       }
@@ -220,7 +234,7 @@
       :global(.scrollyteller .st-panel),
       :global(.scrollyteller .panel) {
         margin-left: auto !important;
-        max-width: none !important;
+        max-width: 900px !important;
         text-align: center;
       }
     }
@@ -231,14 +245,15 @@
    */
   :global(#scrollytellerNAMEfirstFRAME1) {
     margin-bottom: -53vh;
+
+    :global(.panel:last-of-type),
+    :global(.st-panel:last-of-type) {
+      margin-bottom: 100vh;
+    }
   }
   :global(.Header, .Main.u-layout > p) {
     z-index: 100;
     position: relative;
-  }
-  :global(#scrollytellerNAMEfirstFRAME1 .st-panel):last-child ,
-  :global(#scrollytellerNAMEfirstFRAME1 .panel):last-child {
-    margin-bottom: 100vh;
   }
 
   /* Allow the panels to be coloured based on light vs dark background setting */
@@ -246,7 +261,6 @@
   :global(.scrollyteller .st-panel) {
     &::before {
       background-color: var(--background-colour) !important;
-      /* background-image: var(--noise-url); */
       box-shadow: none !important;
       opacity: 0.75;
     }

@@ -34,7 +34,6 @@
 		"d3": "^7.4.4",
 		"d3-hierarchy": "^3.1.2",
 		"jtfell-d3-sankey": "^0.12.5",
-		"jtfell-svelte-scrollyteller": "0.0.11",
 		"layercake": "^7.0.0",
 		"regenerator-runtime": "^0.13.9",
 		"svelte": "^3.48.0"

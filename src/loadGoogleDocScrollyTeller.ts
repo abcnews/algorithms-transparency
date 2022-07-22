@@ -1,4 +1,5 @@
-import { loadScrollyteller } from 'jtfell-svelte-scrollyteller';
+// import { loadScrollyteller } from 'jtfell-svelte-scrollyteller';
+import { loadScrollyteller } from './lib/components/Scrollyteller';
 
 const IDENTITY = (el: Element) => el;
 

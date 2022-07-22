@@ -1,7 +1,9 @@
 import acto from '@abcnews/alternating-case-to-object';
 import { whenOdysseyLoaded } from '@abcnews/env-utils';
 import { getMountValue, selectMounts } from '@abcnews/mount-utils';
-import { loadScrollyteller } from 'jtfell-svelte-scrollyteller';
+// import { loadScrollyteller } from 'jtfell-svelte-scrollyteller';
+// import { loadScrollyteller } from '@abcnews/svelte-components';
+import { loadScrollyteller } from './lib/components/Scrollyteller';
 
 import App from './components/App/App.svelte';
 import LineChart from './components/LineChartAlt/LineChart.svelte';
