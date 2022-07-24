@@ -116,7 +116,7 @@ const loadPanels = (nodes: Element[], initialConfig, name: string): PanelDefinit
 			const configString: string = getMountValue(node, name);
 
 			if (configString) {
-				nextConfigAndMeta = acto(configString) as unknown;
+				nextConfigAndMeta = acto(configString) as PanelMeta;
 			} else {
 				// Empty marks should stop the piecemeal flow
 				nextConfigAndMeta[piecemeal] = false;
