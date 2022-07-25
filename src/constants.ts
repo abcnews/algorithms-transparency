@@ -2,22 +2,10 @@ import { calcDist } from './lib/calc';
 
 export const HISTORICAL_REJECTION_RATES = [0.26, 0.33];
 
-// export const INITIAL_DIST_IND = {
-//   low: 1 / 6,
-//   med: 2 / 6,
-//   high: 3 / 6,
-// };
-//
-// export const INITIAL_DIST_AUS = {
-//   low: 3 / 6,
-//   med: 2 / 6,
-//   high: 1 / 6,
-// };
-
 // red
 export const RED = {
   name: 'India',
-  colour: '#FF5148',
+  colour: '#FF645C',
   numberOfApplicants: 100,
   dist: calcDist(HISTORICAL_REJECTION_RATES[1], HISTORICAL_REJECTION_RATES[0]),
 }
@@ -25,7 +13,7 @@ export const RED = {
 // blue
 export const BLUE = {
   name: 'Australia',
-  colour: '#6B81FF',
+  colour: '#7085FF',
   numberOfApplicants: 100,
   dist: calcDist(HISTORICAL_REJECTION_RATES[0], HISTORICAL_REJECTION_RATES[1]),
 }

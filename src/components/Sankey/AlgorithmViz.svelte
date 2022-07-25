@@ -19,7 +19,6 @@
   // const margin = { top: 25, bottom: 25, left: 25, right: 25 };
   const margin = { top: 5, bottom: 5, left: 5, right: 5 };
   const padding = 10;
-  const psize = 5;
   const speed = 2;
 
   export let width: number;
@@ -32,12 +31,13 @@
   export let scorecardScores: any[];
 
   // TODO: Move this down for scorecard?
-  const TOP_PIPE_HEIGHT = 0.15;
+  const TOP_PIPE_HEIGHT = 0.1;
   const SANKEY_HEIGHT = 0.30;
 
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
-  $: bandWidth = innerWidth / 4 - padding * 3;
+  $: psize = innerWidth > 400 ? 6 : 5;
+  $: bandWidth = innerWidth / 4 - padding * 2;
 
   $: topPipeHeight = innerHeight * TOP_PIPE_HEIGHT;
   $: sankeyHeight = innerHeight * SANKEY_HEIGHT;
@@ -127,9 +127,10 @@
 
 
 // linear-gradient(177.74deg, #1B1023 2%, #776B89 20.89%, #786C8A 48.75%, #1B1023 92.67%);
-  const GRADIENT_END = 0.29;
+  const GRADIENT_END = 0.19;
   const DARK_STOP = '#1B1023';
   const MID_STOP = '#786C8A';
+  const XTRA_STOP = '#32273D';
   const LIGHT_STOP = '#776B89';
 
   $: stop1 = Math.round(TOP_PIPE_HEIGHT / (TOP_PIPE_HEIGHT + SANKEY_HEIGHT) * 100);
@@ -150,7 +151,6 @@
     }
   }
 
-
 </script>
 
 <svg class="algo-viz" {width} {height} viewBox="0 0 {width} {height}">
@@ -158,14 +158,18 @@
     <linearGradient id="linearSankey" x2="0" y2="1">
       <stop offset="0%"   stop-color="{LIGHT_STOP}"/>
       <stop offset="{GRADIENT_END * 100}%" stop-color="{MID_STOP}"/>
-      <stop offset="100%" stop-color="{DARK_STOP}"/>
+      <stop offset="100%" stop-color="{XTRA_STOP}"/>
     </linearGradient>
     <linearGradient id="linearPipe" x2="0" y2="1">
       <stop offset="0%"   stop-color="{DARK_STOP}"/>
       <stop offset="20%"   stop-color="{MID_STOP}"/>
       <stop offset="{stop1}%" stop-color="{LIGHT_STOP}"/>
       <stop offset="{stop1 + stop2}%" stop-color="{MID_STOP}"/>
-      <stop offset="100%" stop-color="{DARK_STOP}"/>
+      <stop offset="100%" stop-color="{XTRA_STOP}"/>
+    </linearGradient>
+    <linearGradient id="endPipe" x2="0" y2="1">
+      <stop offset="0%" stop-color="{XTRA_STOP}"/>
+      <stop offset="80%" stop-color="{DARK_STOP}"/>
     </linearGradient>
   </defs>
 
@@ -179,10 +183,19 @@
             stroke={"url(#linearSankey)"}
             stroke-width={bandWidth}
           />
+
+          <rect
+            in:fade
+            class="end-link"
+            x={link.y1 - bandWidth / 2}
+            fill={"url(#endPipe)"}
+            width={bandWidth}
+            y={sankeyHeight - 1}
+            height={topPipeHeight / 2}
+          />
         {/each}
       </g>
 
-        <!-- in:fade -->
       <rect
         class="middle-link"
         x={innerWidth / 2 - bandWidth / 2}
@@ -225,20 +238,20 @@
             {/key}
           {/if}
 
-          {#if rejectedCount0 && rejectedCount1}
-            <g>
-              <g transition:fade="{{duration:200}}" class="refusals-label" transform="translate({innerWidth / 2}, {sankeyHeight + 85})" text-anchor="middle">
+          {#if rejectedCount0 || rejectedCount1}
+            <g class="refusals" transition:fade="{{duration:200}}">
+              <g class="refusals-label" transform="translate({innerWidth / 2}, {sankeyHeight + 85})" text-anchor="middle">
                 <text>Refusals</text>
               </g>
 
-              <g transition:fade="{{duration:200}}" class="refusals-label" transform="translate({innerWidth / 2 - 100}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+              <g class="refusals-label" transform="translate({innerWidth / 2 - 100}, {sankeyHeight + 85 + 20})" text-anchor="middle">
                 <Particle x={0} y={-35} size={8} colour={activeResults[0].nation.colour} />
                 <text fill={activeResults[0].nation.colour}>
                   {Math.round(rejectedCount0 / (approvedCount0 + rejectedCount0) * 100) || 0}%
                 </text>
               </g>
 
-              <g transition:fade="{{duration:200}}" class="refusals-label" transform="translate({innerWidth / 2 + 100}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+              <g class="refusals-label" transform="translate({innerWidth / 2 + 100}, {sankeyHeight + 85 + 20})" text-anchor="middle">
                 <Particle x={-2} y={-35} size={8} colour={activeResults[1].nation.colour} />
                 <text fill={activeResults[1].nation.colour}>
                   {Math.round(rejectedCount1 / (approvedCount1 + rejectedCount1) * 100) || 0}%
@@ -249,7 +262,7 @@
         {/if}
 
         {#each centeredLinks as link, i}
-          <g class="risk-labels" transform="translate({link.y1}, {sankeyHeight + 5})" text-anchor="middle">
+          <g class="risk-labels" transform="translate({link.y1}, {sankeyHeight + 20})" text-anchor="middle">
             <text
               in:fade
               font-size={$tweenedLabelSizes[i]}

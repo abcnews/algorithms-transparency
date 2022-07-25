@@ -84,18 +84,8 @@
       return animate([{ start: nextFrame, end: nextFrame, loop: false }]);
     }
 
-    // onFinishAnimation = (frame: string) => {
-    //   if (scrollytellerName === 'second' && frame === '3') {
-    //     // Finish the animation
-    //     animate([{ start: "3", loop: false }]);
-    //     // Trigger the cross-fade
-    //     onTransitionToDark();
-    //   }
-    // };
-
     const step = () => {
       const current = timeline.time();
-      console.log(current);
       if (current > 2650) {
         onTransitionToDark();
         return;
@@ -115,8 +105,6 @@
 
     return animate([initialFrameNoLoop]);
   }
-
-  // bind:onFinishAnimation={onFinishAnimation}
 </script>
 
 <SVG

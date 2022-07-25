@@ -13,12 +13,12 @@
   const PI = 3.14;
 </script>
 
-{#if colour === '#FF5148'}
+{#if colour === '#FF645C'}
   <image
     class="particle"
     href="{absolutePath}squarestar.svg"
     {opacity}
-    transition:fade="{{duration:200}}"
+    transition:fade="{{duration:400}}"
     width={size * PI * SQUARE_STAR_ASPECT_RATIO * SQUARE_STAR_DOWNSIZE}
     height={size * PI * SQUARE_STAR_DOWNSIZE}
     x={x - size * (PI / 2) * SQUARE_STAR_ASPECT_RATIO * SQUARE_STAR_DOWNSIZE}
@@ -28,7 +28,7 @@
   <circle
     class="particle"
     {opacity}
-    transition:fade="{{duration:200}}"
+    transition:fade="{{duration:400}}"
     stroke="black"
     stroke-width="0.5"
     fill="{colour}"

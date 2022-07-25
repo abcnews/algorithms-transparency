@@ -66,7 +66,7 @@
   // takes a random number [0..1] and returns particle speed
   $: speedScale = scaleLinear().range([1, 1 + speed])
 
-  $: positionScale = scaleLinear().domain([0, 100]).range([-1 * topHeightPercentage, sankeyHeightPercentage]);
+  $: positionScale = scaleLinear().domain([0, 100]).range([-1 * topHeightPercentage, sankeyHeightPercentage + topHeightPercentage]);
 
   let topPath: SVGPathElement;
   let paths: SVGPathElement[] = [];
@@ -89,6 +89,18 @@
         }
 
         const length = path.getTotalLength();
+        // If in the extended bottom bars
+        if (yPosition > sankeyHeightPercentage) {
+          const endPos = path.getPointAtLength(length);
+          const percentageOfFinalBar = (yPosition - sankeyHeightPercentage) / topHeightPercentage;
+          const finalBarLength = topHeightPercentage * height * 0.5 * 0.3;
+          // console.log(percentageOfFinalBar, finalBarLength);
+          return {
+            x: endPos.x,
+            y: endPos.y + percentageOfFinalBar * finalBarLength,
+          };
+        }
+
         return path.getPointAtLength((yPosition / sankeyHeightPercentage) * length);
       });
 
@@ -131,35 +143,37 @@
       },
     };
 
-    particles = particles.map(d => {
-      const path = cache[d.target.path];
-      if (!path || isNaN(progressPercentage)) {
-        return d;
-      }
+    if (!isNaN(progressPercentage)) {
+      particles = particles.map(d => {
+        const path = cache[d.target.path];
+        if (!path) {
+          return d;
+        }
 
-      // every particle appears at its own time, so adjust the global time `t` to local time
-      d.pos = Math.floor(progressPercentage * d.speed);
-      // extract the current and the next point coordinates from the precomputed cache
-      let coo = path.points[d.pos]
-      if (!coo) {
-        // Add to graph at the end
-        finishedParticles[d.target.name][d.target.group] += 1;
+        // every particle appears at its own time, so adjust the global time `t` to local time
+        d.pos = Math.floor(progressPercentage * d.speed);
+        // extract the current and the next point coordinates from the precomputed cache
+        let coo = path.points[d.pos]
+        if (!coo) {
+          // Add to graph at the end
+          finishedParticles[d.target.name][d.target.group] += 1;
+
+          return {
+            ...d,
+            x: null,
+            y: null,
+          };
+        }
 
         return {
           ...d,
-          x: null,
-          y: null,
+          x: coo.x + d.offset,
+          y: coo.y,
         };
-      }
+      });
 
-      return {
-        ...d,
-        x: coo.x + d.offset,
-        y: coo.y,
-      };
-    });
-
-    onUpdateFinishedParticles(result.nation, finishedParticles);
+      onUpdateFinishedParticles(result.nation, finishedParticles);
+    }
   }
 
   $: centeredLinks = sankey.links.map(l => {

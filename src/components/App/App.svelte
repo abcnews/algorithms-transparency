@@ -165,7 +165,7 @@
     width: 100vw;
     top: 0;
     left: 0;
-    z-index: 3;
+    z-index: 2;
   }
 
   .background-cover {
@@ -252,6 +252,8 @@
   /* Allow the panels to be coloured based on light vs dark background setting */
   :global(.scrollyteller .panel),
   :global(.scrollyteller .st-panel) {
+    z-index: 3;
+
     &::before {
       background-color: var(--background-colour) !important;
       opacity: var(--scrim-opacity);
@@ -283,6 +285,7 @@
     font-weight: 600;
     white-space: nowrap;
     margin-left: -0.2rem;
+    margin-right: 0.1rem;
   }
 
 </style>
