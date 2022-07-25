@@ -67,14 +67,17 @@
   $: speedScale = scaleLinear().range([1, 1 + speed])
 
   $: positionScale = scaleLinear().domain([0, 100]).range([-1 * topHeightPercentage, sankeyHeightPercentage]);
-  $: console.log(result.nation);
 
   let topPath: SVGPathElement;
   let paths: SVGPathElement[] = [];
   let cache = {};
+  let particles: any[] = [];
   $: {
     console.log(width);
     paths.forEach((path, i) => {
+      if (!path || !topPath) {
+        return;
+      }
       // Compute particle positions along the lines.
       const route = routes[i].map(r => `/${r.name}`).join('');
       const points = range(100).map((y: number) => {
@@ -91,25 +94,24 @@
 
       cache[route] = { points };
     });
-  }
 
-  // Initial state of particles
-  $: particles = range(result.nation.numberOfApplicants).map(id => {
-    console.log(width);
-    const target = targetScale(id / 100);
-    return {
-      id,
-      speed: speedScale(Math.random()),
-      colour: result.nation.colour,
-      offset: offsetScale(Math.random()),
-      // current position on the route (will be updated in `chart.update`)
-      pos: 0,
-      // total length of the route, used to determine that the particle has arrived
-      length,
-      // target where the particle is moving
-      target,
-    };
-  });
+    // Initial state of particles
+    particles = range(result.nation.numberOfApplicants).map(id => {
+      const target = targetScale(id / 100);
+      return {
+        id,
+        speed: speedScale(Math.random()),
+        colour: result.nation.colour,
+        offset: offsetScale(Math.random()),
+        // current position on the route (will be updated in `chart.update`)
+        pos: 0,
+        // total length of the route, used to determine that the particle has arrived
+        length,
+        // target where the particle is moving
+        target,
+      };
+    });
+  }
 
   // Update particles based on "progressPercentage"
   $: {
@@ -171,36 +173,39 @@
 
 </script>
 
-<g class="guides">
-    <line
-      x1={width / 2 - 1}
-      x2={width / 2 + 1}
-      y1={0}
-      y2={-1 * height * topHeightPercentage}
-      bind:this={topPath}
-    />
-
-  {#each centeredLinks as link, i}
-    <path
-      d={sankeyLinkVertical()(link)} 
-      stroke-width={bandWidth}
-      bind:this={paths[i]}
-    />
-  {/each}
-</g>
-
-<g class="particles">
-  {#each particles as particle}
-    {#if particle.x && particle.y}
-      <Particle
-        colour={particle.colour}
-        size={psize}
-        x={particle.x}
-        y={particle.y}
+{#key width}
+  <g class="guides">
+      <line
+        x1={width / 2 - 1}
+        x2={width / 2 + 1}
+        y1={0}
+        y2={-1 * height * topHeightPercentage}
+        bind:this={topPath}
       />
-    {/if}
-  {/each}
-</g>
+
+    {#each centeredLinks as link, i}
+      <path
+        d={sankeyLinkVertical()(link)} 
+        stroke-width={bandWidth}
+        bind:this={paths[i]}
+      />
+    {/each}
+  </g>
+
+  <g class="particles">
+    {#each particles as particle}
+      {#if particle.x && particle.y}
+        <Particle
+          opacity={progressPercentage < 10 ? progressPercentage / 10 : 1}
+          colour={particle.colour}
+          size={psize}
+          x={particle.x}
+          y={particle.y}
+        />
+      {/if}
+    {/each}
+  </g>
+{/key}
 
 <style>
   .particles {

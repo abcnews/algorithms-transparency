@@ -1,5 +1,10 @@
 <script lang="ts">
   import { sum } from 'd3';
+  import { tweened } from 'svelte/motion'
+  import { cubicOut } from 'svelte/easing';
+  import { fade } from 'svelte/transition';
+  import { PINK_BG } from '../../constants';
+
   import { sankeyTop, sankeyLinkVertical } from 'jtfell-d3-sankey';
   import {
     genNodes,
@@ -14,7 +19,7 @@
   // const margin = { top: 25, bottom: 25, left: 25, right: 25 };
   const margin = { top: 5, bottom: 5, left: 5, right: 5 };
   const padding = 10;
-  const psize = 4;
+  const psize = 5;
   const speed = 2;
 
   export let width: number;
@@ -27,8 +32,8 @@
   export let scorecardScores: any[];
 
   // TODO: Move this down for scorecard?
-  const TOP_PIPE_HEIGHT = 0.1;
-  const SANKEY_HEIGHT = 0.25;
+  const TOP_PIPE_HEIGHT = 0.15;
+  const SANKEY_HEIGHT = 0.30;
 
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
@@ -120,34 +125,47 @@
     rejectedCount1 = total.rejected[1];
   };
 
-  const linkLabelStyle = (state: string | null, name: string) => {
-    console.log(state, name);
-    if (state === 'highlighthigh' && name === 'high') {
-      return 'red';
-    }
-    if (state === 'highlightlow' && name === 'low') {
-      return 'green';
-    }
-    return '';
-  };
 
-  const GRADIENT_END = 0.8;
+// linear-gradient(177.74deg, #1B1023 2%, #776B89 20.89%, #786C8A 48.75%, #1B1023 92.67%);
+  const GRADIENT_END = 0.29;
+  const DARK_STOP = '#1B1023';
+  const MID_STOP = '#786C8A';
+  const LIGHT_STOP = '#776B89';
 
   $: stop1 = Math.round(TOP_PIPE_HEIGHT / (TOP_PIPE_HEIGHT + SANKEY_HEIGHT) * 100);
   $: stop2 = Math.round((100 - stop1) * GRADIENT_END);
+
+  let labelColours = [PINK_BG, PINK_BG, PINK_BG];
+  const tweenedLabelSizes = tweened([12, 12, 12], { duration: 400, easing: cubicOut });
+  $: {
+    if (state === 'highlighthigh') {
+      tweenedLabelSizes.set([12, 12, 15]);
+      labelColours = [PINK_BG, PINK_BG, 'white'];
+    } else if (state === 'highlightlow') {
+      tweenedLabelSizes.set([15, 12, 12]);
+      labelColours = ['white', PINK_BG, PINK_BG];
+    } else {
+      tweenedLabelSizes.set([12, 12, 12]);
+      labelColours = [PINK_BG, PINK_BG, PINK_BG];
+    }
+  }
+
+
 </script>
 
 <svg class="algo-viz" {width} {height} viewBox="0 0 {width} {height}">
   <defs>
     <linearGradient id="linearSankey" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#8b81a3"/>
-      <stop offset="{GRADIENT_END * 100}%" stop-color="#393542"/>
+      <stop offset="0%"   stop-color="{LIGHT_STOP}"/>
+      <stop offset="{GRADIENT_END * 100}%" stop-color="{MID_STOP}"/>
+      <stop offset="100%" stop-color="{DARK_STOP}"/>
     </linearGradient>
     <linearGradient id="linearPipe" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#393542"/>
-      <stop offset="20%"   stop-color="#8b81a3"/>
-      <stop offset="{stop1}%" stop-color="#8b81a3"/>
-      <stop offset="{stop1 + stop2}%" stop-color="#393542"/>
+      <stop offset="0%"   stop-color="{DARK_STOP}"/>
+      <stop offset="20%"   stop-color="{MID_STOP}"/>
+      <stop offset="{stop1}%" stop-color="{LIGHT_STOP}"/>
+      <stop offset="{stop1 + stop2}%" stop-color="{MID_STOP}"/>
+      <stop offset="100%" stop-color="{DARK_STOP}"/>
     </linearGradient>
   </defs>
 
@@ -156,6 +174,7 @@
       <g class="links">
         {#each centeredLinks as link}
           <path
+            in:fade
             d={sankeyLinkVertical()(link)} 
             stroke={"url(#linearSankey)"}
             stroke-width={bandWidth}
@@ -163,6 +182,7 @@
         {/each}
       </g>
 
+        <!-- in:fade -->
       <rect
         class="middle-link"
         x={innerWidth / 2 - bandWidth / 2}
@@ -190,42 +210,53 @@
         {/each}
       {/if}
 
-      {#if scorecardScores.length}
-        <foreignObject x={0} y={-45} width={innerWidth} height={280}>
-          <Scorecard scores={scorecardScores} {state} />
-        </foreignObject>
-      {/if}
-
       <g class="labels">
         {#if showRefusals}
           {#if year !== 'none' && year !== 'historical'}
-            <g class="year-label" transform="translate({innerWidth / 2}, {(sankeyHeight / 2) * 0.90})" text-anchor="middle">
-              <text>{year}</text>
-            </g>
+            {#key year}
+              <g
+                transition:fade="{{duration: 600}}"
+                class="year-label"
+                transform="translate({innerWidth / 2}, {(sankeyHeight / 2) * 0.90})"
+                text-anchor="middle"
+              >
+                <text>{year}</text>
+              </g>
+            {/key}
           {/if}
 
           {#if rejectedCount0 && rejectedCount1}
-            <g class="refusals-label" transform="translate({innerWidth / 2}, {sankeyHeight + 85})" text-anchor="middle">
-              <text>Refusals</text>
-            </g>
+            <g>
+              <g transition:fade="{{duration:200}}" class="refusals-label" transform="translate({innerWidth / 2}, {sankeyHeight + 85})" text-anchor="middle">
+                <text>Refusals</text>
+              </g>
 
-            <Particle x={80} y={sankeyHeight + 85 - 15} size={8} colour={activeResults[0].nation.colour} />
-            <g class="refusals-label" style="fill:{activeResults[0].nation.colour}" transform="translate({80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
-              <text>{Math.round(rejectedCount0 / (approvedCount0 + rejectedCount0) * 100) || 0}%</text>
-            </g>
+              <g transition:fade="{{duration:200}}" class="refusals-label" transform="translate({innerWidth / 2 - 100}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+                <Particle x={0} y={-35} size={8} colour={activeResults[0].nation.colour} />
+                <text fill={activeResults[0].nation.colour}>
+                  {Math.round(rejectedCount0 / (approvedCount0 + rejectedCount0) * 100) || 0}%
+                </text>
+              </g>
 
-            <Particle x={innerWidth - 82} y={sankeyHeight + 85 - 15} size={8} colour={activeResults[1].nation.colour} />
-            <g class="refusals-label" style="fill:{activeResults[1].nation.colour}" transform="translate({innerWidth - 80}, {sankeyHeight + 85 + 20})" text-anchor="middle">
-              <text>{Math.round(rejectedCount1 / (approvedCount1 + rejectedCount1) * 100) || 0}%</text>
+              <g transition:fade="{{duration:200}}" class="refusals-label" transform="translate({innerWidth / 2 + 100}, {sankeyHeight + 85 + 20})" text-anchor="middle">
+                <Particle x={-2} y={-35} size={8} colour={activeResults[1].nation.colour} />
+                <text fill={activeResults[1].nation.colour}>
+                  {Math.round(rejectedCount1 / (approvedCount1 + rejectedCount1) * 100) || 0}%
+                </text>
+              </g>
             </g>
           {/if}
         {/if}
 
-        {#each centeredLinks as link}
-          <g transform="translate({link.y1}, {sankeyHeight + 5})" text-anchor="middle">
-          <text fill="{linkLabelStyle(state, link.target.name)}">
+        {#each centeredLinks as link, i}
+          <g class="risk-labels" transform="translate({link.y1}, {sankeyHeight + 5})" text-anchor="middle">
+            <text
+              in:fade
+              font-size={$tweenedLabelSizes[i]}
+              fill={labelColours[i]}
+            >
               <tspan x="1" dy="1.2em" text-anchor="middle">{link.target.name === 'med' ? 'medium' : link.target.name}</tspan>
-              <tspan x="0" dy="1.2em" text-anchor="middle">risk</tspan>
+              <tspan x="0" dy="1.4em" text-anchor="middle">risk</tspan>
             </text>
           </g>
         {/each}
@@ -233,6 +264,20 @@
     </g>
   </g>
 </svg>
+
+{#if scorecardScores.length}
+  <div
+    class="scorecard-wrapper"
+    style="
+      width: {height}px;
+      height: {height}px;
+      padding-top: 10%;
+    "
+  >
+    <Scorecard width={innerWidth * 0.83} height={280} scores={scorecardScores} {state} />
+  </div>
+{/if}
+
 
 <style>
   .wrapper {
@@ -245,17 +290,30 @@
 
   .labels {
     font-family: ABCSans, Helvetica, sans-serif;
-    font-weight: 700;
+    font-weight: 900;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
     fill: white;
-    font-size: 12px;
   }
 
   .labels .year-label {
     font-size: 28px;
+    /* text-shadow: */
+    /*   -1.25px -1.25px 0 #000, */
+    /*   0 -1.25px 0 #000, */
+    /*   1.25px -1.25px 0 #000, */
+    /*   1.25px 0 0 #000, */
+    /*   1.25px 1.25px 0 #000, */
+    /*   0 1.25px 0 #000, */
+    /*   -1.25px 1.25px 0 #000, */
+    /*   -1.25px 0 0 #000; */
   }
 
   .labels .refusals-label {
     font-size: 18px;
+  }
+
+  .risk-labels {
+    line-height: 15px;
   }
 </style>

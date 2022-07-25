@@ -5,10 +5,11 @@
 
   export let frameMarker: string | null;
   export let scrollytellerName: string;
-  export let onTransitionToDark: any;
+  export let onTransitionToDark: any = (frame: string) => frame;
 
-  let onFinishAnimation: any = null;
+  // let onFinishAnimation: any = null;
   let currentMarkerState: string | null = null;
+  let timeline: any;
 
   const FINAL_FRAME = {
     first: '6',
@@ -43,7 +44,9 @@
   $: setAnimation(currentMarkerState, frameMarker);
   $: absolutePath = __webpack_public_path__ || '/';
 
+  let animationFrame;
   const setAnimation = (currentState: string | null, nextFrame: string | null) => {
+    cancelAnimationFrame(animationFrame)
     if (!nextFrame || currentState === nextFrame || !svgComponent) {
       return;
     }
@@ -81,13 +84,29 @@
       return animate([{ start: nextFrame, end: nextFrame, loop: false }]);
     }
 
-    onFinishAnimation = (frame: string) => {
-      if (scrollytellerName === 'second' && frame === '3') {
-        if (onTransitionToDark) {
-          onTransitionToDark();
-        }
+    // onFinishAnimation = (frame: string) => {
+    //   if (scrollytellerName === 'second' && frame === '3') {
+    //     // Finish the animation
+    //     animate([{ start: "3", loop: false }]);
+    //     // Trigger the cross-fade
+    //     onTransitionToDark();
+    //   }
+    // };
+
+    const step = () => {
+      const current = timeline.time();
+      console.log(current);
+      if (current > 2650) {
+        onTransitionToDark();
+        return;
       }
+      animationFrame = window.requestAnimationFrame(step);
     };
+
+    // setup check for crossfade callback
+    if (scrollytellerName === 'second' && nextFrame === '2') {
+      animationFrame = window.requestAnimationFrame(step);
+    }
 
     // The last frame just has a null end marker
     if (nextFrame === finalFrame) {
@@ -97,12 +116,13 @@
     return animate([initialFrameNoLoop]);
   }
 
+  // bind:onFinishAnimation={onFinishAnimation}
 </script>
 
 <SVG
   path={`${absolutePath}${svgPath}`}
   bind:this={svgComponent}
-  onFinishAnimation={onFinishAnimation}
+  bind:timeline={timeline}
   onLoad={() => {
     setAnimation(null, frameMarker);
   }}

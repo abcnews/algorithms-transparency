@@ -42,8 +42,6 @@
       typeof ticks === 'function' ?
         ticks($yScale.ticks()) :
           $yScale.ticks(ticks);
-
-  $: console.log($width, $padding, $xRange);
 </script>
 
 <g class='axis y-axis' transform='translate({-$padding.left}, 0)'>

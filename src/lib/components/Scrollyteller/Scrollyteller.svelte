@@ -96,8 +96,7 @@
 	$: marker && onMarker(marker);
 
   let height: number;
-  $: scrolloutOffset = useScrollout ? 400 : 0;
-  $: console.log('HEIGHT', height);
+  $: scrolloutOffset = useScrollout ? 600 : 0;
 </script>
 
 <svelte:window on:resize={windowResizeHandler} on:scroll={onProgress ? scrollHandler : null} />

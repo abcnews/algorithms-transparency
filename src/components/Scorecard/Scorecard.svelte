@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import Particle from '../Sankey/Particle.svelte';
   import { RED, BLUE } from '../../constants';
   // $: absolutePath = __webpack_public_path__ || '/';
@@ -11,8 +12,10 @@
 
   export let scores: Score[];
   export let state: string;
+  // export let height: number;
+  export let width: number;
 
-  const grade = (score) => {
+  const grade = (score: Score) => {
     const diff = Math.abs(score.p2 - score.p1) 
     if (diff < 3) {
       return 'A+';
@@ -22,12 +25,20 @@
     }
     return 'D';
   };
-
 </script>
 
-<div class="sankey-scorecard">
+<div
+  class="sankey-scorecard"
+  style="
+    width: {width}px;
+  "
+>
   <div class="row">
-    <svg height={22} width={22}>
+    <svg
+      height={22}
+      width={22}
+      style="transform: translateX(15%);"
+    >
       <Particle
         size={8}
         x={11}
@@ -38,7 +49,11 @@
 
     <h6>VISA REFUSALS</h6>
 
-    <svg height={22} width={24}>
+    <svg
+      height={22}
+      width={24}
+      style="transform: translateX(-15%);"
+    >
       <Particle
         size={8}
         x={10}
@@ -52,7 +67,15 @@
     <span class="title">{score.label}</span>
       {#if state === 'running'}
         <div class="row">
-          <span class="score" style="color: {BLUE.colour} !important;">{score.p1}%</span>
+          <span
+            class="score"
+            style="
+              color: {BLUE.colour} !important;
+              transform: translateX(15%);
+            "
+          >
+            {score.p1}%
+          </span>
           <div class="bar-wrapper">
             <div class="bar">
               <div
@@ -69,7 +92,15 @@
               />
             </div>
           </div>
-          <span class="score" style="color: {RED.colour} !important;">{score.p2}%</span>
+          <span
+            class="score"
+            style="
+              color: {RED.colour} !important;
+              transform: translateX(-15%);
+            "
+          >
+            {score.p2}%
+          </span>
         </div>
       {:else}
         <div>
@@ -85,6 +116,7 @@
   .sankey-scorecard {
     font-family: ABCSans, Helvetica, sans-serif;
 
+    /* position: fixed; */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -120,7 +152,7 @@
       justify-content: space-between;
       width: 100%;
 
-      font-weight: 700;
+      font-weight: 900;
 
       .score {
         font-size: 0.9rem;

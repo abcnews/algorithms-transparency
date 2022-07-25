@@ -4,19 +4,17 @@
 
   // Path of SVG asset
   export let path: string;
+  export let timeline: any = null;
 
   // Callback for parent
-  export let onLoad: any;
-  export let onFinishAnimation: any;
+  export let onLoad = () => null; 
+  export let onFinishAnimation = (end: string) => end;
 
-  let timeline: any = null;
   const onLoadCb = () => {
     timeline = animateFn();
     timeline?.pause();
 
-    if (onLoad) {
-      onLoad();
-    }
+    onLoad();
   };
 
   let animateFn: any;
@@ -47,8 +45,8 @@
       elem.setAttribute('id', newID);
       idMap[originalID] = newID;
 
-      const DATA_ATTRS = ['fill', 'stroke', 'mask'];
-      DATA_ATTRS.forEach(attr => {
+      const ATTRS = ['fill', 'stroke', 'mask'];
+      ATTRS.forEach(attr => {
         const elemsUsing = svg.querySelectorAll(`[${attr}="url(#${originalID})"]`);
         Array.from(elemsUsing).forEach(elem => {
           elem.setAttribute(attr, `url(#${newID})`);
@@ -58,7 +56,6 @@
       const XLINK_ATTRS = ['href'];
       XLINK_ATTRS.forEach(attr => {
         const elemsUsing = svg.querySelectorAll(`[*|${attr}="#${originalID}"]`);
-        console.log(elemsUsing);
         Array.from(elemsUsing).forEach(elem => {
           elem.setAttribute(`xlink:${attr}`, `#${newID}`);
         });
@@ -98,8 +95,6 @@
       timeline.onfinish = null;
       const { start, end, loop } = frame;
 
-      // console.log(start, end, loop);
-
       if (start === end) {
         return timeline.time(start).pause();
       }
@@ -114,11 +109,7 @@
       if (frames.length > 0) {
         timeline.onfinish = next;
       } else {
-        timeline.onfinish = () => {
-          if (onFinishAnimation) {
-            onFinishAnimation(end);
-          }
-        };
+        timeline.onfinish = () => onFinishAnimation(end);
       }
 
       // Play through once

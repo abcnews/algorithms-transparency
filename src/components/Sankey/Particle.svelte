@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
   export let colour: string;
   export let x: number;
   export let y: number;
   export let size: number;
+  export let opacity = 1;
 
   $: absolutePath = __webpack_public_path__ || '/';
 
@@ -13,7 +15,10 @@
 
 {#if colour === '#FF5148'}
   <image
+    class="particle"
     href="{absolutePath}squarestar.svg"
+    {opacity}
+    transition:fade="{{duration:200}}"
     width={size * PI * SQUARE_STAR_ASPECT_RATIO * SQUARE_STAR_DOWNSIZE}
     height={size * PI * SQUARE_STAR_DOWNSIZE}
     x={x - size * (PI / 2) * SQUARE_STAR_ASPECT_RATIO * SQUARE_STAR_DOWNSIZE}
@@ -22,7 +27,8 @@
 {:else}
   <circle
     class="particle"
-    opacity="1"
+    {opacity}
+    transition:fade="{{duration:200}}"
     stroke="black"
     stroke-width="0.5"
     fill="{colour}"

@@ -1,4 +1,6 @@
 <script lang="ts">
+  // import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
   import Scrollyteller from '../../lib/components/Scrollyteller';
   // import Scrollyteller from '@abcnews/svelte-components/components/Scrollyteller/Scrollyteller.svelte';
   import AnimationController from '../AnimationController/AnimationController.svelte';
@@ -9,6 +11,9 @@
 
   export let scrollyData: any;
   export let name: string;
+  export let onTransitionToInsideBox = () => null;
+  export let onTransitionToOutsideBox = () => null;
+  export let isDarkBackground: string;
 
   // HIGH LEVEL STATE
   let scrollytellerName = name || 'first';
@@ -20,12 +25,6 @@
   // running, finished, updated
   let sankeyState: string | null = null;
   let sankeyScorecard: boolean = false;
-
-  const isDarkBackground = (name: string, frame: string | null): boolean => {
-    return isSankeyFrame(name, frame) ||
-      (name === 'third' && !!frame) ||
-      (name === 'forth' && !!frame);
-  };
 
   const isSankeyFrame = (name: string, frame: string | null): boolean => {
     // UK Visa Processing
@@ -41,7 +40,8 @@
   };
 
   let updateState = ((state: any) => {
-    const prevFrame = frameMarker;
+    // console.log(state);
+    // const prevFrame = frameMarker;
     if (state.frame) {
       frameMarker = String(state.frame);
     }
@@ -52,19 +52,12 @@
       sankeyScorecard = !!state.scorecard;
     }
 
-    // Special case around the transition point
-    if (scrollytellerName === 'second' && frameMarker === '2') {
-      if (prevFrame === '3') {
-        setToLightBackground();
-      }
-      return;
+    // Special cases around the transition point
+    if (scrollytellerName === 'second' && (frameMarker === '2' || frameMarker === '1')) {
+      onTransitionToOutsideBox();
     }
-
-    // Otherwise, set the background to light vs dark based on progress through the story
-    if (isDarkBackground(scrollytellerName, frameMarker)) {
-      setToDarkBackground();
-    } else {
-      setToLightBackground();
+    if (scrollytellerName === 'second' && frameMarker === '3') {
+      onTransitionToInsideBox();
     }
   });
 
@@ -72,29 +65,10 @@
   let width: number;
   let height: number;
   let simWidth: number;
-  let darkBackground: boolean = false;
-
   const root = document.documentElement;
-  const setToLightBackground = () => {
-    darkBackground = false;
-    root.style.setProperty('--background-colour', PINK_BG);
-    root.style.setProperty('--text-colour', 'black');
-    root.style.setProperty('--link-colour', '#0073a8');
-    root.style.setProperty('--noise-opacity', '0.25');
-  };
-  const setToDarkBackground = () => {
-    darkBackground = true;
-    root.style.setProperty('--background-colour', DARK_BG);
-    root.style.setProperty('--text-colour', 'white');
-    root.style.setProperty('--link-colour', '#d398ea');
-    root.style.setProperty('--noise-opacity', '0.12');
-  };
+
   $: absolutePath = __webpack_public_path__ || '/';
   $: root.style.setProperty('--noise-url', `url(${absolutePath}Noise.png)`);
-
-  // Start with light background
-  setToLightBackground();
-
   $: simWidth = Math.min(500, width);
 
   // Centre the animation frame on small screens
@@ -119,7 +93,7 @@
   onMarker={updateState}
   {postprocessPanel}
   useScrollout={scrollytellerName !== 'first'}
-  backgroundColour={darkBackground ? DARK_BG : PINK_BG}
+  backgroundColour={isDarkBackground ? DARK_BG : PINK_BG}
 >
 
   <main
@@ -139,13 +113,13 @@
         showScorecard={sankeyScorecard}
       />
     {:else}
-      {#if darkBackground && scrollytellerName === 'second'}
-        <div class="background-cover" />
+      {#if isDarkBackground && scrollytellerName === 'second'}
+        <div in:fade="{{duration: 200,delay:400}}" class="background-cover" />
       {/if}
       <AnimationController
         {scrollytellerName}
         {frameMarker}
-        onTransitionToDark={setToDarkBackground}
+        onTransitionToDark={onTransitionToInsideBox}
       />
     {/if}
   </main>
@@ -154,6 +128,7 @@
 <style lang="scss">
   :global(.Main, html) {
     background: var(--background-colour);
+    transition: background 400ms ease-in;
   }
 
   :global(.FormatCredit > p > span) {
@@ -169,6 +144,11 @@
     color: var(--text-colour);
     position: relative;
     z-index: 100;
+    transition: color 400ms ease-in;
+
+    :global(a) {
+      color: var(--text-colour) !important;
+    }
   }
 
   .graphic {
@@ -176,6 +156,7 @@
     height: 100vh;
     width: 100vw;
     background: var(--background-colour);
+    transition: background 400ms ease-in;
   }
 
   .noise {
@@ -197,10 +178,12 @@
 
   :global(.Main > p, .Main > h2) {
     color: var(--text-colour);
+    transition: color 400ms ease-in;
   }
 
   /* size and position the visuals based on the viewport height */
-  :global(.graphic svg) {
+  :global(.graphic > .scorecard-wrapper),
+  :global(.graphic > svg) {
     /* https://jonathannicol.com/blog/2014/06/16/centre-crop-thumbnails-with-css/ */
     position: absolute;
     left: 50%;
@@ -215,7 +198,8 @@
 
   /* Move the graphic to the left and the text to the right on desktop */
   @media (min-width: 76rem) {
-    :global(.graphic svg) {
+    :global(.graphic > .scorecard-wrapper),
+    :global(.graphic > svg) {
       transform: translate(-50vw, -50%);
     }
 
@@ -244,7 +228,12 @@
      The end of the first scrollyteller needs to land just on top of the title
    */
   :global(#scrollytellerNAMEfirstFRAME1) {
-    margin-bottom: -53vh;
+    margin-bottom: -43vh;
+
+    :global(.panel:first-child),
+    :global(.st-panel:first-child) {
+      margin-top: 62vh;
+    }
 
     :global(.panel:last-of-type),
     :global(.st-panel:last-of-type) {
@@ -256,23 +245,34 @@
     position: relative;
   }
 
+  :global(.Header) {
+    background: linear-gradient(6deg, rgba(197,184,223,0.420045518207283) 100%, rgba(197,184,223,0.8981967787114846) 0%);
+  }
+
   /* Allow the panels to be coloured based on light vs dark background setting */
   :global(.scrollyteller .panel),
   :global(.scrollyteller .st-panel) {
     &::before {
       background-color: var(--background-colour) !important;
+      opacity: var(--scrim-opacity);
       box-shadow: none !important;
-      opacity: 0.75;
+      transition: background-color 400ms ease-in;
     }
+  }
 
-    :global(a) {
-      color: var(--link-colour) !important;
-    }
+  :global(a) {
+    color: var(--link-colour) !important;
+    /* transition: color 600ms linear; */
 
-    :global(p),
-    :global(span) {
-      color: var(--text-colour) !important;
+    &:visited {
+      color: var(--link-colour-visited) !important;
     }
+  }
+
+  :global(p),
+  :global(span) {
+    color: var(--text-colour) !important;
+    /* transition: color 600ms linear; */
   }
 
   /* 
@@ -280,15 +280,9 @@
      during the sankey section
    */
   :global(.panel-text-highlight) {
-    margin: 0 0.05em;
-    border: 0.125rem solid transparent;
-    padding: 0 0.2em;
-    display: inline-block;
-    color: #fff;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1.25;
+    font-weight: 600;
     white-space: nowrap;
+    margin-left: -0.2rem;
   }
 
 </style>

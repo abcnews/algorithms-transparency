@@ -1,4 +1,5 @@
 import { RED, BLUE } from '../constants';
+import Particle from '../components/Sankey/Particle.svelte';
 
 //
 // Highlight 'Red' and 'Blue' references in panel text
@@ -27,8 +28,23 @@ export const postprocessPanel = (panel) => {
 
     Object.keys(COLOUR_MAPPING).map(k => {
       if (text === k) {
-        (node as any).parentNode.style.backgroundColor = COLOUR_MAPPING[k];
+        (node as any).parentNode.style.color = COLOUR_MAPPING[k];
         (node as any).parentNode.classList.add('panel-text-highlight');
+
+        const particle = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        particle.setAttribute('height', '22');
+        particle.setAttribute('width', '22');
+        new Particle({
+          target: particle,
+          props: {
+            colour: COLOUR_MAPPING[k],
+            size: 6,
+            x: 12,
+            y: 15,
+          }
+        });
+
+        (node as any).parentNode.insertBefore(particle, node);
       }
     });
   });
