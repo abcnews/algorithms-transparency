@@ -21,6 +21,10 @@ const statsPerCountryPerYear = statsCsv.reduce(
       year.rate = year.Issued / (year.Refused + year.Withdrawn + year.Issued) * 100;
     }
 
+    // if (line[COLUMNS.COUNTRY] === 'Australia') {
+    //   console.log(year, line);
+    // }
+
     country[line[COLUMNS.YEAR]] = year;
     return {
       ...acc,

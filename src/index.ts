@@ -2,7 +2,7 @@ import acto from '@abcnews/alternating-case-to-object';
 import { whenOdysseyLoaded } from '@abcnews/env-utils';
 import { getMountValue, selectMounts } from '@abcnews/mount-utils';
 import { loadScrollyteller } from './lib/components/Scrollyteller';
-import { PINK_BG, DARK_BG } from './constants';
+import { PINK_BG, DARK_BG, PINK_SCRIM, DARK_SCRIM } from './constants';
 
 import App from './components/App/App.svelte';
 import LineChart from './components/LineChartAlt/LineChart.svelte';
@@ -16,6 +16,7 @@ const SCROLLYTELLERS = [
   'second',
   'third',
   'fourth',
+  'fifth',
 ];
 
 let scrollytellerComponents: any[] = [];
@@ -27,46 +28,70 @@ const updateStates = () => {
 const root = document.documentElement;
 
 const setToLightBackground = () => {
+  if (!isDarkBackground) {
+    return;
+  }
   isDarkBackground = false;
   root.style.setProperty('--background-colour', PINK_BG);
   root.style.setProperty('--text-colour', 'black');
   root.style.setProperty('--link-colour', '#004DB2');
   root.style.setProperty('--link-colour-visited', '#300099');
-  root.style.setProperty('--scrim-opacity', '0.75');
   root.style.setProperty('--noise-opacity', '0.25');
+  root.style.setProperty('--scrim-opacity', '0.8');
+  root.style.setProperty('--scrim-background-colour', PINK_SCRIM);
   updateStates();
 };
 const setToDarkBackground = () => {
+  if (isDarkBackground) {
+    return;
+  }
+  console.log('here');
   isDarkBackground = true;
   root.style.setProperty('--background-colour', DARK_BG);
   root.style.setProperty('--text-colour', 'white');
   root.style.setProperty('--link-colour', '#6BB5FF');
   root.style.setProperty('--link-colour-visited', '#C0A3FF');
-  root.style.setProperty('--scrim-opacity', '0.8');
   root.style.setProperty('--noise-opacity', '0.12');
+  root.style.setProperty('--scrim-opacity', '0.85');
+  root.style.setProperty('--scrim-background-colour', DARK_SCRIM);
   updateStates();
 };
 
+isDarkBackground = true;
+setToLightBackground();
+
 const checkBg = () => {
-  const transitionPoint = root.querySelector('.special-colours');
-  const rect = transitionPoint?.getBoundingClientRect();
-  if (!rect) {
+  const transitionPointIn = root.querySelector('.transition-into-box');
+  const transitionPointOut = root.querySelector('.transition-out-of-box');
+  const rectIn = transitionPointIn?.getBoundingClientRect();
+  const rectOut = transitionPointOut?.getBoundingClientRect();
+  if (!rectIn || !rectOut) {
     return;
   }
 
-  const diffTop = rect.top;
-  const diffBottom = rect.bottom - (window.innerHeight || document.documentElement.clientHeight);
+  const diffTopIn = rectIn.top;
+  const diffBottomIn = rectIn.bottom - (window.innerHeight || document.documentElement.clientHeight);
+  const diffTopOut = rectOut.top;
+  const diffBottomOut = rectOut.bottom - (window.innerHeight || document.documentElement.clientHeight);
 
-  if (diffTop < -500) {
-    // We're below the panel
-    // console.log('below');
-    return setToDarkBackground();
-  }
-  if (diffBottom > 700) {
-    // We're above the panel
+  // console.log({ diffBottomIn, diffTopIn, diffBottomOut, diffTopOut });
+
+  // We're in the first section
+  if (diffBottomIn > 700) {
     // console.log('above');
     return setToLightBackground();
   }
+  // We're in between (inside the box)
+  if (diffTopIn < -500 && diffBottomOut > 700) {
+    // console.log('below');
+    return setToDarkBackground();
+  }
+
+  // We're in the final section
+  if (diffTopOut < -500) {
+    return setToLightBackground();
+  }
+
   // We're somewhere around the transition point so we defer to the callbacks triggered by the animation
   // console.log('too close');
 };
@@ -86,12 +111,15 @@ whenOdysseyLoaded.then(() => {
             name,
             isDarkBackground,
             onTransitionToInsideBox: () => {
-              setToDarkBackground();
-              checkBg();
+              root.style.setProperty('--background-colour', DARK_BG);
+              root.style.setProperty('--noise-opacity', '0.12');
+              setTimeout(setToDarkBackground, 650);
             },
             onTransitionToOutsideBox: () => {
               setToLightBackground();
-              checkBg();
+              root.style.setProperty('--background-colour', PINK_BG);
+              root.style.setProperty('--noise-opacity', '0.25');
+              setTimeout(setToLightBackground, 650);
             },
           }
         });

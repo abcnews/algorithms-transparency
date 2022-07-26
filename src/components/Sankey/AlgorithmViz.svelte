@@ -228,7 +228,8 @@
           {#if year !== 'none' && year !== 'historical'}
             {#key year}
               <g
-                transition:fade="{{duration: 600}}"
+                out:fade="{{duration: 400}}"
+                in:fade="{{duration: 400, delay: 700}}"
                 class="year-label"
                 transform="translate({innerWidth / 2}, {(sankeyHeight / 2) * 0.90})"
                 text-anchor="middle"

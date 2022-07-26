@@ -29,8 +29,11 @@
       if (p?.data.sankey) {
         p.panelClass = `sankey-panel year-${p.data.year} state-${p.data.state || ''}`;
       }
-      if (p?.data.specialcolours) {
-        p.panelClass = 'special-colours';
+      if (p?.data.intobox) {
+        p.panelClass = 'transition-into-box';
+      }
+      if (p?.data.outofbox) {
+        p.panelClass = 'transition-out-of-box';
       }
 
       if (p.data.state === 'finished') {

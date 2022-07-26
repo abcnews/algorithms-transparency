@@ -32,7 +32,8 @@
       return true;
     }
 
-    if (name === 'fourth') {
+    // Algo audits
+    if (name === 'fourth' && frame === '1') {
       return true;
     }
 
@@ -40,8 +41,7 @@
   };
 
   let updateState = ((state: any) => {
-    // console.log(state);
-    // const prevFrame = frameMarker;
+    const prevFrame = frameMarker;
     if (state.frame) {
       frameMarker = String(state.frame);
     }
@@ -52,12 +52,19 @@
       sankeyScorecard = !!state.scorecard;
     }
 
-    // Special cases around the transition point
-    if (scrollytellerName === 'second' && (frameMarker === '2' || frameMarker === '1')) {
+    // Special cases around the transition points
+    if (scrollytellerName === 'second' && (frameMarker === '2' || frameMarker === '1') && prevFrame === '3') {
       onTransitionToOutsideBox();
     }
     if (scrollytellerName === 'second' && frameMarker === '3') {
       onTransitionToInsideBox();
+    }
+
+    if (scrollytellerName === 'fourth' && frameMarker === '1' && prevFrame === '2') {
+      onTransitionToInsideBox();
+    }
+    if (scrollytellerName === 'fourth' && frameMarker === '2') {
+      onTransitionToOutsideBox();
     }
   });
 
@@ -224,6 +231,13 @@
     }
   }
 
+  :global(#scrollytellerNAMEfifthFRAME1 > .scrollyteller) {
+    margin-bottom: 0 !important;
+
+    :global(.scrollout-cover-end) {
+      display: none;
+    }
+  }
   /* 
      The end of the first scrollyteller needs to land just on top of the title
    */
@@ -255,7 +269,7 @@
     z-index: 3;
 
     &::before {
-      background-color: var(--background-colour) !important;
+      background-color: var(--scrim-background-colour) !important;
       opacity: var(--scrim-opacity);
       box-shadow: none !important;
       transition: background-color 400ms ease-in;

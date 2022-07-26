@@ -15,6 +15,8 @@
     first: '6',
     second: '3',
     third: '6',
+    fourth: '2',
+    fifth: '3',
   };
   $: finalFrame = FINAL_FRAME[scrollytellerName];
 
@@ -22,6 +24,8 @@
     first: 'Algorithms_Part1.svg',
     second: 'Algorithms_Part2.svg',
     third: 'Algorithms_Part3.svg',
+    fourth: 'Algorithms_Part4.svg',
+    fifth: 'Algorithms_Finale.svg',
   };
   $: svgPath = SVGS[scrollytellerName];
 
@@ -30,15 +34,8 @@
       if (frameMarker === '6') {
         return true;
       }
-      return false;
     }
-    if (scrollytellerName === 'second') {
-      return false;
-    }
-    if (scrollytellerName === 'third') {
-      return false;
-    }
-    return true;
+    return false;
   };
 
   $: setAnimation(currentMarkerState, frameMarker);
@@ -97,6 +94,8 @@
     if (scrollytellerName === 'second' && nextFrame === '2') {
       animationFrame = window.requestAnimationFrame(step);
     }
+
+    console.log(scrollytellerName, nextFrame);
 
     // The last frame just has a null end marker
     if (nextFrame === finalFrame) {

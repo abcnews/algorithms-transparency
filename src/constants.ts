@@ -36,6 +36,8 @@ export const LINE_CHART_COLOURS = {
 
 export const PINK_BG = '#c5b8df';
 export const DARK_BG = '#1B1023';
+export const DARK_SCRIM = '#211527';
+export const PINK_SCRIM = '#C5B9DE';
 
 export const AUDIT_SCORECARD = [
   {
