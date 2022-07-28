@@ -138,15 +138,6 @@
     transition: background 400ms ease-in;
   }
 
-  :global(.FormatCredit > p > span) {
-    color: white;
-  }
-
-  :global(.Main.u-layout > h2) {
-    position: relative;
-    z-index: 100;
-  }
-
   :global(.Main a) {
     color: var(--link-colour) !important;
     /* transition: color 600ms linear; */
@@ -156,9 +147,18 @@
     }
   }
 
+  /* Other content should go above the scrollyteller scrollout divs and the noise div */
+  :global(.Main.u-layout > h2) ,
+  :global(.Main.u-layout > ul),
   :global(header) {
     z-index: 5;
     position: relative;
+  }
+
+  :global(.FormatCredit > p > span) {
+    z-index: 5;
+    position: relative;
+    color: white;
   }
 
   :global(.scrollyteller .st-panel p),
@@ -167,7 +167,6 @@
     color: var(--text-colour) !important;
     transition: color 400ms ease-in;
   }
-
 
   :global(.ImageEmbed.u-pull) {
     color: var(--text-colour);
@@ -246,6 +245,10 @@
         text-align: center;
       }
     }
+  }
+
+  :global(#scrollytellerNAMEfifthFRAME1) {
+    margin-bottom: -30vh;
   }
 
   :global(#scrollytellerNAMEfifthFRAME1 > .scrollyteller) {
