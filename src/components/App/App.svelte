@@ -155,7 +155,7 @@
     position: relative;
   }
 
-  :global(.FormatCredit > p > span) {
+  :global(.FormatCredit) {
     z-index: 5;
     position: relative;
     color: white;
