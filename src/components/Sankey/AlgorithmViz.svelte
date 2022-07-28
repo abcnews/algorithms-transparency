@@ -160,14 +160,14 @@
       <stop offset="{GRADIENT_END * 100}%" stop-color="{MID_STOP}"/>
       <stop offset="100%" stop-color="{XTRA_STOP}"/>
     </linearGradient>
-    <linearGradient id="linearPipe" x2="0" y2="1">
+    <linearGradient id="topPipe" x2="0" y2="1">
       <stop offset="0%"   stop-color="{DARK_STOP}"/>
       <stop offset="20%"   stop-color="{MID_STOP}"/>
       <stop offset="{stop1}%" stop-color="{LIGHT_STOP}"/>
       <stop offset="{stop1 + stop2}%" stop-color="{MID_STOP}"/>
       <stop offset="100%" stop-color="{XTRA_STOP}"/>
     </linearGradient>
-    <linearGradient id="endPipe" x2="0" y2="1">
+    <linearGradient id="bottomPipe" x2="0" y2="1">
       <stop offset="0%" stop-color="{XTRA_STOP}"/>
       <stop offset="80%" stop-color="{DARK_STOP}"/>
     </linearGradient>
@@ -177,21 +177,21 @@
     <g transform="translate({margin.left}, {margin.top + topPipeHeight})">
       <g class="links">
         {#each centeredLinks as link}
+          <rect
+            in:fade
+            class="end-link"
+            x={link.y1 - bandWidth / 2}
+            fill={"url(#bottomPipe)"}
+            width={bandWidth}
+            y={sankeyHeight - 2}
+            height={topPipeHeight / 2}
+          />
+
           <path
             in:fade
             d={sankeyLinkVertical()(link)} 
             stroke={"url(#linearSankey)"}
             stroke-width={bandWidth}
-          />
-
-          <rect
-            in:fade
-            class="end-link"
-            x={link.y1 - bandWidth / 2}
-            fill={"url(#endPipe)"}
-            width={bandWidth}
-            y={sankeyHeight - 1}
-            height={topPipeHeight / 2}
           />
         {/each}
       </g>
@@ -199,7 +199,7 @@
       <rect
         class="middle-link"
         x={innerWidth / 2 - bandWidth / 2}
-        fill={"url(#linearPipe)"}
+        fill={"url(#topPipe)"}
         width={bandWidth}
         y={-1 * topPipeHeight}
         height={sankeyHeight + topPipeHeight}

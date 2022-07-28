@@ -96,7 +96,7 @@
 	$: marker && onMarker(marker);
 
   let height: number;
-  $: scrolloutOffset = useScrollout ? 600 : 0;
+  $: scrolloutOffset = useScrollout ? 800 : 0;
 </script>
 
 <svelte:window on:resize={windowResizeHandler} on:scroll={onProgress ? scrollHandler : null} />
@@ -164,7 +164,7 @@
 	.content {
 		margin-top: calc(var(--vh, 1vh) * -100);
 		position: relative;
-		z-index: 2;
+		z-index: 4;
 		overflow: hidden;
 		min-height: calc(var(--vh, 1vh) * 100);
     display: flex;
