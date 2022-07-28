@@ -147,6 +147,28 @@
     z-index: 100;
   }
 
+  :global(.Main a) {
+    color: var(--link-colour) !important;
+    /* transition: color 600ms linear; */
+
+    &:visited {
+      color: var(--link-colour-visited) !important;
+    }
+  }
+
+  :global(header) {
+    z-index: 5;
+    position: relative;
+  }
+
+  :global(.scrollyteller .st-panel p),
+  :global(.scrollyteller .panel p),
+  :global(.Main > p, .Main > h2, .Main > span) {
+    color: var(--text-colour) !important;
+    transition: color 400ms ease-in;
+  }
+
+
   :global(.ImageEmbed.u-pull) {
     color: var(--text-colour);
     position: relative;
@@ -181,11 +203,6 @@
     height: 100vh;
     width: 100vw;
     z-index: 5000;
-  }
-
-  :global(.Main > p, .Main > h2) {
-    color: var(--text-colour);
-    transition: color 400ms ease-in;
   }
 
   /* size and position the visuals based on the viewport height */
@@ -274,21 +291,6 @@
       box-shadow: none !important;
       transition: background-color 400ms ease-in;
     }
-  }
-
-  :global(a) {
-    color: var(--link-colour) !important;
-    /* transition: color 600ms linear; */
-
-    &:visited {
-      color: var(--link-colour-visited) !important;
-    }
-  }
-
-  :global(p),
-  :global(span) {
-    color: var(--text-colour) !important;
-    /* transition: color 600ms linear; */
   }
 
   /* 

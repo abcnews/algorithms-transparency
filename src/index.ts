@@ -113,7 +113,12 @@ whenOdysseyLoaded.then(() => {
             onTransitionToInsideBox: () => {
               root.style.setProperty('--background-colour', DARK_BG);
               root.style.setProperty('--noise-opacity', '0.12');
-              setTimeout(setToDarkBackground, 650);
+              root.style.setProperty('--scrim-opacity', '0.85');
+              root.style.setProperty('--scrim-background-colour', DARK_SCRIM);
+              // root.style.setProperty('--text-colour', 'white');
+              // root.style.setProperty('--link-colour', '#6BB5FF');
+              // root.style.setProperty('--link-colour-visited', '#C0A3FF');
+              setTimeout(setToDarkBackground, 450);
             },
             onTransitionToOutsideBox: () => {
               setToLightBackground();

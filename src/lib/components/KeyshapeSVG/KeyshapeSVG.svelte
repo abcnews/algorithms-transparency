@@ -11,8 +11,12 @@
   export let onFinishAnimation = (end: string) => end;
 
   const onLoadCb = () => {
-    timeline = animateFn();
-    timeline?.pause();
+    try {
+      timeline = animateFn();
+      timeline?.pause();
+    } catch (e) {
+      console.warn(e);
+    }
 
     onLoad();
   };
@@ -49,6 +53,7 @@
       ATTRS.forEach(attr => {
         const elemsUsing = svg.querySelectorAll(`[${attr}="url(#${originalID})"]`);
         Array.from(elemsUsing).forEach(elem => {
+          // console.log(attr, elem);
           elem.setAttribute(attr, `url(#${newID})`);
         });
       });
@@ -57,6 +62,7 @@
       XLINK_ATTRS.forEach(attr => {
         const elemsUsing = svg.querySelectorAll(`[*|${attr}="#${originalID}"]`);
         Array.from(elemsUsing).forEach(elem => {
+          // console.log(attr, elem);
           elem.setAttribute(`xlink:${attr}`, `#${newID}`);
         });
       });
@@ -73,7 +79,7 @@
 
       // Replace any prefixed IDs in the SVG
       Object.keys(idMap).forEach(id => {
-        animationCode = animationCode.replace(`"#${id}"`, `"#${idMap[id]}"`);
+        animationCode = animationCode.replaceAll(`"#${id}"`, `"#${idMap[id]}"`);
       });
 
       // Insert extracted code into a function
