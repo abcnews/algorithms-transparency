@@ -3,6 +3,7 @@ import { whenOdysseyLoaded } from '@abcnews/env-utils';
 import { getMountValue, selectMounts } from '@abcnews/mount-utils';
 import { loadScrollyteller } from './lib/components/Scrollyteller';
 import { PINK_BG, DARK_BG, PINK_SCRIM, DARK_SCRIM } from './constants';
+import './global.scss';
 
 import App from './components/App/App.svelte';
 import LineChart from './components/LineChartAlt/LineChart.svelte';
@@ -45,7 +46,6 @@ const setToDarkBackground = () => {
   if (isDarkBackground) {
     return;
   }
-  console.log('here');
   isDarkBackground = true;
   root.style.setProperty('--background-colour', DARK_BG);
   root.style.setProperty('--text-colour', 'white');
@@ -61,12 +61,22 @@ isDarkBackground = true;
 setToLightBackground();
 
 const checkBg = () => {
+  const isInside = isInsideBox();
+  if (isInside === 'inside') {
+    return setToDarkBackground();
+  }
+  if (isInside === 'outside') {
+    return setToLightBackground();
+  }
+}
+
+const isInsideBox = () => {
   const transitionPointIn = root.querySelector('.transition-into-box');
   const transitionPointOut = root.querySelector('.transition-out-of-box');
   const rectIn = transitionPointIn?.getBoundingClientRect();
   const rectOut = transitionPointOut?.getBoundingClientRect();
   if (!rectIn || !rectOut) {
-    return;
+    return null;
   }
 
   const diffTopIn = rectIn.top;
@@ -74,26 +84,22 @@ const checkBg = () => {
   const diffTopOut = rectOut.top;
   const diffBottomOut = rectOut.bottom - (window.innerHeight || document.documentElement.clientHeight);
 
-  // console.log({ diffBottomIn, diffTopIn, diffBottomOut, diffTopOut });
-
   // We're in the first section
   if (diffBottomIn > 700) {
-    // console.log('above');
-    return setToLightBackground();
+    return 'outside';
   }
   // We're in between (inside the box)
   if (diffTopIn < -500 && diffBottomOut > 700) {
-    // console.log('below');
-    return setToDarkBackground();
+    return 'inside';
   }
 
   // We're in the final section
   if (diffTopOut < -500) {
-    return setToLightBackground();
+    return 'outside';
   }
 
   // We're somewhere around the transition point so we defer to the callbacks triggered by the animation
-  // console.log('too close');
+  return null;
 };
 
 whenOdysseyLoaded.then(() => {
@@ -111,20 +117,26 @@ whenOdysseyLoaded.then(() => {
             name,
             isDarkBackground,
             onTransitionToInsideBox: () => {
+              if (isInsideBox() === 'outside') {
+                return;
+              }
               root.style.setProperty('--background-colour', DARK_BG);
-              root.style.setProperty('--noise-opacity', '0.12');
-              root.style.setProperty('--scrim-opacity', '0.85');
-              root.style.setProperty('--scrim-background-colour', DARK_SCRIM);
+              // root.style.setProperty('--noise-opacity', '0.12');
+              // root.style.setProperty('--scrim-opacity', '0.85');
+              // root.style.setProperty('--scrim-background-colour', DARK_SCRIM);
               // root.style.setProperty('--text-colour', 'white');
               // root.style.setProperty('--link-colour', '#6BB5FF');
               // root.style.setProperty('--link-colour-visited', '#C0A3FF');
-              setTimeout(setToDarkBackground, 450);
+              setTimeout(setToDarkBackground, 100);
             },
             onTransitionToOutsideBox: () => {
+              if (isInsideBox() === 'inside') {
+                return;
+              }
               setToLightBackground();
-              root.style.setProperty('--background-colour', PINK_BG);
-              root.style.setProperty('--noise-opacity', '0.25');
-              setTimeout(setToLightBackground, 650);
+              // root.style.setProperty('--background-colour', PINK_BG);
+              // root.style.setProperty('--noise-opacity', '0.25');
+              // setTimeout(setToLightBackground, 50);
             },
           }
         });

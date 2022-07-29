@@ -129,17 +129,6 @@
 {/if}
 
 <style lang="scss">
-  :global(.scrollyteller .sankey-panel) {
-    :global(p),
-    :global(span) {
-      color: white;
-    }
-
-    &::before {
-      background-color: #1B1023 !important;
-    }
-  }
-
   :global(.sankey-scorecard) {
     font-family: ABCSans, Helvetica, sans-serif;
 

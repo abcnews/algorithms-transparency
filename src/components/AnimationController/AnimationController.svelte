@@ -7,9 +7,9 @@
   export let scrollytellerName: string;
   export let onTransitionToDark: any = (frame: string) => frame;
 
-  // let onFinishAnimation: any = null;
   let currentMarkerState: string | null = null;
   let timeline: any;
+  let timeoutRef: any;
 
   const FINAL_FRAME = {
     first: '6',
@@ -41,9 +41,8 @@
   $: setAnimation(currentMarkerState, frameMarker);
   $: absolutePath = __webpack_public_path__ || '/';
 
-  let animationFrame;
   const setAnimation = (currentState: string | null, nextFrame: string | null) => {
-    cancelAnimationFrame(animationFrame)
+    clearTimeout(timeoutRef);
     if (!nextFrame || currentState === nextFrame || !svgComponent) {
       return;
     }
@@ -81,21 +80,10 @@
       return animate([{ start: nextFrame, end: nextFrame, loop: false }]);
     }
 
-    const step = () => {
-      const current = timeline.time();
-      if (current > 2650) {
-        onTransitionToDark();
-        return;
-      }
-      animationFrame = window.requestAnimationFrame(step);
-    };
-
-    // setup check for crossfade callback
+    // trigger crossfade callback
     if (scrollytellerName === 'second' && nextFrame === '2') {
-      animationFrame = window.requestAnimationFrame(step);
+      timeoutRef = setTimeout(onTransitionToDark, 2750);
     }
-
-    console.log(scrollytellerName, nextFrame);
 
     // The last frame just has a null end marker
     if (nextFrame === finalFrame) {
@@ -112,6 +100,7 @@
   bind:timeline={timeline}
   onLoad={() => {
     setAnimation(null, frameMarker);
+    return null;
   }}
 />
 

@@ -1,8 +1,6 @@
 <script lang="ts">
-  // import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import Scrollyteller from '../../lib/components/Scrollyteller';
-  // import Scrollyteller from '@abcnews/svelte-components/components/Scrollyteller/Scrollyteller.svelte';
   import AnimationController from '../AnimationController/AnimationController.svelte';
   import Simulation, { preprocessPanels } from '../Sankey/Simulation.svelte';
 
@@ -121,7 +119,7 @@
       />
     {:else}
       {#if isDarkBackground && scrollytellerName === 'second'}
-        <div in:fade="{{duration: 200,delay:400}}" class="background-cover" />
+        <div class="background-cover" />
       {/if}
       <AnimationController
         {scrollytellerName}
@@ -133,52 +131,6 @@
 </Scrollyteller>
 
 <style lang="scss">
-  :global(.Main, html) {
-    background: var(--background-colour);
-    transition: background 400ms ease-in;
-  }
-
-  :global(.Main a) {
-    color: var(--link-colour) !important;
-    /* transition: color 600ms linear; */
-
-    &:visited {
-      color: var(--link-colour-visited) !important;
-    }
-  }
-
-  /* Other content should go above the scrollyteller scrollout divs and the noise div */
-  :global(.Main.u-layout > h2) ,
-  :global(.Main.u-layout > ul),
-  :global(header) {
-    z-index: 5;
-    position: relative;
-  }
-
-  :global(.FormatCredit) {
-    z-index: 5;
-    position: relative;
-    color: white;
-  }
-
-  :global(.scrollyteller .st-panel p),
-  :global(.scrollyteller .panel p),
-  :global(.Main > p, .Main > h2, .Main > span) {
-    color: var(--text-colour) !important;
-    transition: color 400ms ease-in;
-  }
-
-  :global(.ImageEmbed.u-pull) {
-    color: var(--text-colour);
-    position: relative;
-    z-index: 100;
-    transition: color 400ms ease-in;
-
-    :global(a) {
-      color: var(--text-colour) !important;
-    }
-  }
-
   .graphic {
     position: relative;
     height: 100vh;
@@ -201,110 +153,7 @@
     position: absolute;
     height: 100vh;
     width: 100vw;
-    z-index: 5000;
-  }
-
-  /* size and position the visuals based on the viewport height */
-  :global(.graphic > .scorecard-wrapper),
-  :global(.graphic > svg) {
-    /* https://jonathannicol.com/blog/2014/06/16/centre-crop-thumbnails-with-css/ */
-    position: absolute;
-    left: 50%;
-    top: 50%;
-
-    /* We want to force 1:1 ratio, and lose the sides */
-    width: 100vh;
-    height: 100vh;
-    transform: translate(var(--x-offset), -50%);
-    max-width: 5000vw;
-  }
-
-  /* Move the graphic to the left and the text to the right on desktop */
-  @media (min-width: 76rem) {
-    :global(.graphic > .scorecard-wrapper),
-    :global(.graphic > svg) {
-      transform: translate(-50vw, -50%);
-    }
-
-    :global(.scrollyteller .st-panel),
-    :global(.scrollyteller .panel) {
-      margin-left: 55vw !important;
-      max-width: 40vw !important;
-    }
-
-    /* Keep the first scrollyteller centered */
-    :global(#scrollytellerNAMEfirstFRAME1) {
-      :global(.graphic svg) {
-        transform: translate(var(--x-offset), -50%);
-      }
-
-      :global(.scrollyteller .st-panel),
-      :global(.scrollyteller .panel) {
-        margin-left: auto !important;
-        max-width: 900px !important;
-        text-align: center;
-      }
-    }
-  }
-
-  :global(#scrollytellerNAMEfifthFRAME1) {
-    margin-bottom: -30vh;
-  }
-
-  :global(#scrollytellerNAMEfifthFRAME1 > .scrollyteller) {
-    margin-bottom: 0 !important;
-
-    :global(.scrollout-cover-end) {
-      display: none;
-    }
-  }
-  /* 
-     The end of the first scrollyteller needs to land just on top of the title
-   */
-  :global(#scrollytellerNAMEfirstFRAME1) {
-    margin-bottom: -43vh;
-
-    :global(.panel:first-child),
-    :global(.st-panel:first-child) {
-      margin-top: 62vh;
-    }
-
-    :global(.panel:last-of-type),
-    :global(.st-panel:last-of-type) {
-      margin-bottom: 100vh;
-    }
-  }
-  :global(.Header, .Main.u-layout > p) {
-    z-index: 100;
-    position: relative;
-  }
-
-  :global(.Header) {
-    background: linear-gradient(6deg, rgba(197,184,223,0.420045518207283) 100%, rgba(197,184,223,0.8981967787114846) 0%);
-  }
-
-  /* Allow the panels to be coloured based on light vs dark background setting */
-  :global(.scrollyteller .panel),
-  :global(.scrollyteller .st-panel) {
-    z-index: 3;
-
-    &::before {
-      background-color: var(--scrim-background-colour) !important;
-      opacity: var(--scrim-opacity);
-      box-shadow: none !important;
-      transition: background-color 400ms ease-in;
-    }
-  }
-
-  /* 
-     This class is added to 'Red' and 'Blue' mentions in the scrollyteller panels
-     during the sankey section
-   */
-  :global(.panel-text-highlight) {
-    font-weight: 600;
-    white-space: nowrap;
-    margin-left: -0.2rem;
-    margin-right: 0.1rem;
+    z-index: 50;
   }
 
 </style>
