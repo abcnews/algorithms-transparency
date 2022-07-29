@@ -74,8 +74,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { subscribe } from '@abcnews/progress-utils';
-  import { AUDIT_SCORECARD } from '../../constants';
-
   import AlgorithmViz from './AlgorithmViz.svelte';
 
   // Use the classes added to panels in "preprocessPanels" to keep track of the scroll percentage
@@ -107,12 +105,11 @@
 
   export let width: number;
   export let height: number;
+  export let yOffset: number;
   export let year: string;
   export let state: string | null;
-  export let showScorecard: boolean;
 
   $: showRefusals = year !== 'audit';
-  $: scorecardScores = showScorecard ? AUDIT_SCORECARD : [];
 </script>
 
 {#if width && height}
@@ -123,10 +120,11 @@
     {year}
     {state}
     {showRefusals}
-    {scorecardScores}
     progressPercentage={panelPercentages[year]}
+    {yOffset}
   />
 {/if}
+
 
 <style lang="scss">
   :global(.sankey-scorecard) {

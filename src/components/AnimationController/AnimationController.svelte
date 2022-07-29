@@ -15,8 +15,7 @@
     first: '6',
     second: '3',
     third: '6',
-    fourth: '2',
-    fifth: '3',
+    fourth: '3',
   };
   $: finalFrame = FINAL_FRAME[scrollytellerName];
 
@@ -25,7 +24,6 @@
     second: 'Algorithms_Part2.svg',
     third: 'Algorithms_Part3.svg',
     fourth: 'Algorithms_Part4.svg',
-    fifth: 'Algorithms_Finale.svg',
   };
   $: svgPath = SVGS[scrollytellerName];
 
@@ -84,6 +82,8 @@
     if (scrollytellerName === 'second' && nextFrame === '2') {
       timeoutRef = setTimeout(onTransitionToDark, 2750);
     }
+
+    console.log(nextFrame, finalFrame);
 
     // The last frame just has a null end marker
     if (nextFrame === finalFrame) {

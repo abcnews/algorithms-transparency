@@ -13,7 +13,6 @@
 
   import NationParticles from './NationParticles.svelte';
   import Particle from './Particle.svelte';
-  import Scorecard from '../Scorecard/Scorecard.svelte';
 
   // const margin = { top: 0, bottom: 0, left: 0, right: 0 };
   // const margin = { top: 25, bottom: 25, left: 25, right: 25 };
@@ -23,12 +22,12 @@
 
   export let width: number;
   export let height: number;
+  export let yOffset: number;
   export let progressPercentage: number;
   export let results: Record<string, any>;
   export let year: string;
   export let state: string | null;
   export let showRefusals: boolean;
-  export let scorecardScores: any[];
 
   // TODO: Move this down for scorecard?
   const TOP_PIPE_HEIGHT = 0.1;
@@ -150,10 +149,9 @@
       labelColours = [PINK_BG, PINK_BG, PINK_BG];
     }
   }
-
 </script>
 
-<svg class="algo-viz" {width} {height} viewBox="0 0 {width} {height}">
+<svg class="algo-viz" {width} {height} viewBox="0 0 {width} {height}" style="margin-top: -{yOffset}px">
   <defs>
     <linearGradient id="linearSankey" x2="0" y2="1">
       <stop offset="0%"   stop-color="{LIGHT_STOP}"/>
@@ -278,20 +276,6 @@
     </g>
   </g>
 </svg>
-
-{#if scorecardScores.length}
-  <div
-    class="scorecard-wrapper"
-    style="
-      width: {height}px;
-      height: {height}px;
-      padding-top: 10%;
-    "
-  >
-    <Scorecard width={innerWidth * 0.83} height={280} scores={scorecardScores} {state} />
-  </div>
-{/if}
-
 
 <style>
   .wrapper {

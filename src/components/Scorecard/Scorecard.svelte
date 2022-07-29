@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import Particle from '../Sankey/Particle.svelte';
   import { RED, BLUE } from '../../constants';
-  // $: absolutePath = __webpack_public_path__ || '/';
 
   interface Score {
     label: string;
