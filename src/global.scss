@@ -10,6 +10,7 @@
       color: var(--text-colour) !important;
     }
 
+    h1::after,
     h2::before {
       background-color: #766699;
       opacity: 0.6;
@@ -41,7 +42,6 @@
   .scrollyteller .st-panel p,
   .scrollyteller .panel p {
     color: var(--text-colour) !important;
-    // transition: color 400ms ease-in;
   }
 
   /* Allow the panels to be coloured based on light vs dark background setting */
@@ -53,7 +53,6 @@
       background-color: var(--scrim-background-colour) !important;
       opacity: var(--scrim-opacity);
       box-shadow: none !important;
-      // transition: background-color 400ms ease-in;
     }
   }
 
