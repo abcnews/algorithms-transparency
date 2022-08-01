@@ -94,7 +94,7 @@
 	});
 
   $: showScorecard = (frameMarker === '1' && !!sankeyScorecard) || (scrollytellerName === 'fourth' && frameMarker === '2');
-  $: showScorecard ? yOffsetSankey.set(height * 0.4) : yOffsetSankey.set(0);
+  $: showScorecard ? yOffsetSankey.set(height * 0.45) : yOffsetSankey.set(0);
   $: scorecardOnBox = scrollytellerName === 'fourth' && frameMarker === '2';
 
   let scorecardScores = AUDIT_SCORECARD;
