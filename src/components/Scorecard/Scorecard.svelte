@@ -45,7 +45,7 @@
     if (isOutsideBox) {
       timeoutRef = setTimeout(() => {
         labelScale.set(0.35);
-        labelOffset.set(25);
+        labelOffset.set(30);
         xRotation.set(4);
       }, 2500);
     } else {
@@ -56,6 +56,7 @@
     }
   }
 
+  $: showGrades = state !== 'running';
 </script>
 
 <div
@@ -65,9 +66,12 @@
     transform:
       scale({$labelScale})
       rotateX(-{$xRotation}deg)
-      translateY(-{$labelOffset}px);
+      translateY(-{$labelOffset}%);
   "
 >
+  <div class="row">
+    <h6>VISA REFUSALS</h6>
+  </div>
   <div class="row">
     <svg
       height={22}
@@ -82,12 +86,13 @@
       />
     </svg>
 
-    <h6>VISA REFUSALS</h6>
-
     <svg
       height={22}
       width={24}
-      style="transform: translateX(-15%);"
+      style="
+        transform: translateX(calc(-15% - {showGrades ? 45 : 0}px));
+        transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1)
+      "
     >
       <Particle
         size={8}
@@ -100,50 +105,47 @@
 
   {#each scores as score}
     <span class="title">{score.label}</span>
-      {#if state === 'running'}
-        <div class="row">
-          <span
-            class="score"
-            style="
-              color: {BLUE.colour} !important;
-              transform: translateX(15%);
-            "
-          >
-            {score.p1}%
-          </span>
-          <div class="bar-wrapper">
-            <div class="bar">
-              <div
-                class="bar-inner"
-                style="background: {BLUE.colour}; width: {100 * score.p1 / 50}%; margin-left: auto;"
-              />
-            </div>
-            <div class="middle-line" />
+      <div class="row">
+        <span
+          class="score"
+          style="
+            color: {BLUE.colour} !important;
+            transform: translateX(15%);
+          "
+        >
+          {score.p1}%
+        </span>
+        <div class="bar-wrapper">
+          <div class="bar">
+            <div
+              class="bar-inner"
+              style="background: {BLUE.colour}; width: {100 * score.p1 / 50}%; margin-left: auto;"
+            />
+          </div>
+          <div class="middle-line" />
 
-            <div class="bar">
-              <div
-                class="bar-inner"
-                style="background: {RED.colour}; width: {100 * score.p2 / 50}%"
-              />
+          <div class="bar">
+            <div
+              class="bar-inner"
+              style="background: {RED.colour}; width: {100 * score.p2 / 50}%"
+            />
+          </div>
+        </div>
+        <span
+          class="score"
+          style="
+            color: {RED.colour} !important;
+            transform: translateX(-15%);
+          "
+        >
+          {score.p2}%
+        </span>
+          <div class="grade" style="width: {showGrades ? 60 : 0.00001}px;">
+            <div style="opacity: {showGrades ? 1 : 0}">
+              {grade(score)}
             </div>
           </div>
-          <span
-            class="score"
-            style="
-              color: {RED.colour} !important;
-              transform: translateX(-15%);
-            "
-          >
-            {score.p2}%
-          </span>
-        </div>
-      {:else}
-        <div>
-          <span class="title {Math.abs(score.p2 - score.p1) < 10 ? 'a' : 'd'}">
-            {grade(score)}
-          </span>
-        </div>
-      {/if}
+      </div>
   {/each}
 </div>
 
@@ -171,14 +173,19 @@
       width: 100px;
       text-align: center;
       transform: translateY(2px);
+    }
 
-      &.a {
-        color: green;
-        font-weight: 700;
-      }
-      &.d {
-        color: red;
-        font-weight: 700;
+    .grade {
+      font-size: 0.9rem;
+      text-align: center;
+
+      div {
+        width: inherit;
+        border-radius: 50%;
+        background: white;
+        color: black;
+        margin: auto;
+        width: 25px;
       }
     }
 
@@ -188,6 +195,11 @@
       width: 100%;
 
       font-weight: 900;
+
+      /* Animate adding the grades */
+      & > * {
+        transition: width 500ms cubic-bezier(0.22, 0.61, 0.36, 1);
+      }
 
       .score {
         font-size: 0.9rem;
