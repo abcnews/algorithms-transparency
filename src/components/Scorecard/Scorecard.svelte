@@ -11,7 +11,7 @@
   }
 
   export let scores: Score[];
-  export let state: string;
+  export let state: string | null;
   // export let height: number;
   export let width: number;
   export let isOutsideBox = false;
@@ -44,8 +44,8 @@
   $: {
     if (isOutsideBox) {
       timeoutRef = setTimeout(() => {
-        labelScale.set(0.35);
-        labelOffset.set(30);
+        labelScale.set(0.38);
+        labelOffset.set(60);
         xRotation.set(4);
       }, 2500);
     } else {
@@ -66,7 +66,7 @@
     transform:
       scale({$labelScale})
       rotateX(-{$xRotation}deg)
-      translateY(-{$labelOffset}%);
+      translateY(-{$labelOffset}px);
   "
 >
   <div class="row">

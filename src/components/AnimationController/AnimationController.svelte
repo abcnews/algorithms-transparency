@@ -106,7 +106,7 @@
   bind:this={svgComponent}
   bind:timeline={timeline}
   onLoad={() => {
-    setAnimation(null, frameMarker);
+    setAnimation(null, frameMarker || '1');
     return null;
   }}
 />

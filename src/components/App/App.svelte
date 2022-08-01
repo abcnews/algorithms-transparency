@@ -160,13 +160,12 @@
         style="
           width: {height}px;
           height: {height}px;
-          padding-top: {height * .5 - 200}px;
+          padding-top: {height * .25}px;
           perspective: 250px;
-          ;
         "
       >
         <Scorecard
-          width={simWidth * 0.83}
+          width={simWidth * 0.73}
           height={280}
           scores={scorecardScores}
           state={sankeyState}
