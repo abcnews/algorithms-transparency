@@ -36,7 +36,7 @@ export const LINE_CHART_COLOURS = {
 
 export const PINK_BG = '#c5b8df';
 export const DARK_BG = '#1B1023';
-export const DARK_SCRIM = '#211527';
+export const DARK_SCRIM = '#1D1326';
 export const PINK_SCRIM = '#C5B9DE';
 
 export const AUDIT_SCORECARD = [
@@ -47,8 +47,8 @@ export const AUDIT_SCORECARD = [
   },
   {
     label: 'Age',
-    p1: 35,
-    p2: 27,
+    p1: 36,
+    p2: 32,
   },
   {
     label: 'Gender',

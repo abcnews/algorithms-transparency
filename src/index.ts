@@ -52,7 +52,7 @@ const setToDarkBackground = () => {
   root.style.setProperty('--link-colour', '#6BB5FF');
   root.style.setProperty('--link-colour-visited', '#C0A3FF');
   root.style.setProperty('--noise-opacity', '0.12');
-  root.style.setProperty('--scrim-opacity', '0.85');
+  root.style.setProperty('--scrim-opacity', '0.80');
   root.style.setProperty('--scrim-background-colour', DARK_SCRIM);
   updateStates();
 };
