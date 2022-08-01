@@ -153,7 +153,7 @@
   }
 </script>
 
-<svg class="algo-viz" {width} {height} viewBox="0 0 {width} {height}" style="margin-top: -{yOffset}px">
+<svg class="algo-viz" {width} {height} viewBox="0 0 {width} {height}" style="margin-top: {150 - yOffset}px">
   <defs>
     <linearGradient id="linearSankey" x2="0" y2="1">
       <stop offset="0%"   stop-color="{LIGHT_STOP}"/>

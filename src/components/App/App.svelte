@@ -94,7 +94,7 @@
 	});
 
   $: showScorecard = (frameMarker === '1' && !!sankeyScorecard) || (scrollytellerName === 'fourth' && frameMarker === '2');
-  $: showScorecard ? yOffsetSankey.set(height * 0.3) : yOffsetSankey.set(0);
+  $: showScorecard ? yOffsetSankey.set(height * 0.4) : yOffsetSankey.set(0);
   $: scorecardOnBox = scrollytellerName === 'fourth' && frameMarker === '2';
 
   let scorecardScores = AUDIT_SCORECARD;
@@ -144,9 +144,7 @@
         {onUpdateCounts}
       />
     {:else}
-      {#if isDarkBackground && scrollytellerName === 'second'}
-        <div class="background-cover" />
-      {/if}
+      <div class="background-cover" style="opacity:{isDarkBackground && scrollytellerName === 'second' ? 1 : 0}" />
       <AnimationController
         {scrollytellerName}
         {frameMarker}
@@ -162,7 +160,7 @@
         style="
           width: {height}px;
           height: {height}px;
-          padding-top: {200}px;
+          padding-top: {height * .5 - 200}px;
           perspective: 250px;
           ;
         "
@@ -204,6 +202,7 @@
     height: 100vh;
     width: 100vw;
     z-index: 50;
+    transition: opacity 400ms ease-in;
   }
 
 </style>

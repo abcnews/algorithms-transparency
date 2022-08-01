@@ -40,10 +40,10 @@
   $: absolutePath = __webpack_public_path__ || '/';
 
   const setAnimation = (currentState: string | null, nextFrame: string | null) => {
-    clearTimeout(timeoutRef);
     if (!nextFrame || currentState === nextFrame || !svgComponent) {
       return;
     }
+    clearTimeout(timeoutRef);
     const animate = svgComponent.animate;
 
     // If we're scrolling down, don't let the animation get > 2 frames behind the text
@@ -82,17 +82,15 @@
       ]);
     } 
 
-    // If scrolling up, pause at the end state
-    if (parseInt(currentState || '0') > parseInt(nextFrame)) {
-      return animate([{ start: nextFrame, end: nextFrame, loop: false }]);
-    }
-
     // trigger crossfade callback
     if (scrollytellerName === 'second' && nextFrame === '2') {
       timeoutRef = setTimeout(onTransitionToDark, 2750);
     }
 
-    console.log(nextFrame, finalFrame);
+    // If scrolling up, pause at the end state
+    if (parseInt(currentState || '0') > parseInt(nextFrame)) {
+      return animate([{ start: nextFrame, end: nextFrame, loop: false }]);
+    }
 
     // The last frame just has a null end marker
     if (nextFrame === finalFrame) {

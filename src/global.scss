@@ -1,5 +1,5 @@
 
-  html {
+  #app-container {
     background: var(--background-colour);
   }
 
@@ -12,6 +12,7 @@
 
     h2::before {
       background-color: #766699;
+      opacity: 0.6;
     }
 
     a {
@@ -59,8 +60,7 @@
   .ImageEmbed.u-pull {
     color: var(--text-colour);
     position: relative;
-    z-index: 100;
-    // transition: color 400ms ease-in;
+    z-index: 3;
 
     a {
       color: var(--text-colour) !important;
