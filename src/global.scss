@@ -10,6 +10,10 @@
       color: var(--text-colour) !important;
     }
 
+    h2::before {
+      background-color: #766699;
+    }
+
     a {
       color: var(--link-colour) !important;
 

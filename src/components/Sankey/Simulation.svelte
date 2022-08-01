@@ -108,6 +108,7 @@
   export let yOffset: number;
   export let year: string;
   export let state: string | null;
+  export let onUpdateCounts: (totals: any) => void = () => null;
 
   $: showRefusals = year !== 'audit';
 </script>
@@ -120,6 +121,7 @@
     {year}
     {state}
     {showRefusals}
+    {onUpdateCounts}
     progressPercentage={panelPercentages[year]}
     {yOffset}
   />

@@ -46,12 +46,21 @@
     }
     const animate = svgComponent.animate;
 
+    // If we're scrolling down, don't let the animation get > 2 frames behind the text
+    let skipTo: null | string = null;
+    if (timeline &&
+      (parseInt(nextFrame || '') > parseInt(currentMarkerState || '')) &&
+      (timeline.time() < timeline.marker(currentMarkerState)?.time)
+    ) {
+      skipTo = currentMarkerState;
+    }
+
     // Set the current state variable for next time
     currentMarkerState = nextFrame;
 
-    const initialFrameNoLoop = { start: nextFrame, end: String(parseInt(nextFrame) + 1), loop: false };
-    const initialFrameWithLoop = { start: nextFrame, end: `${nextFrame}Loop`, loop: false };
-    const loopFrame = { start: `${nextFrame}Loop`, end: String(parseInt(nextFrame) + 1), loop: true };
+    const initialFrameNoLoop = { start: nextFrame, end: String(parseInt(nextFrame) + 1), loop: false, skipTo };
+    const initialFrameWithLoop = { start: nextFrame, end: `${nextFrame}Loop`, loop: false, skipTo };
+    const loopFrame = { start: `${nextFrame}Loop`, end: String(parseInt(nextFrame) + 1), loop: true, skipTo };
 
     if (hasLoopFrame(scrollytellerName, nextFrame)) {
       // If scrolling up, just do the loop frame

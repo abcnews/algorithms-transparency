@@ -28,6 +28,7 @@
   export let year: string;
   export let state: string | null;
   export let showRefusals: boolean;
+  export let onUpdateCounts: (totals: any) => void = () => null;
 
   // TODO: Move this down for scorecard?
   const TOP_PIPE_HEIGHT = 0.1;
@@ -122,6 +123,7 @@
     approvedCount1 = total.approved[1];
     rejectedCount0 = total.rejected[0];
     rejectedCount1 = total.rejected[1];
+    onUpdateCounts(total);
   };
 
 

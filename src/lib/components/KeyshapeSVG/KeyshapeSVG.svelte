@@ -99,7 +99,7 @@
         return;
       }
       timeline.onfinish = null;
-      const { start, end, loop } = frame;
+      const { start, end, loop, skipTo } = frame;
 
       if (start === end) {
         return timeline.time(start).pause();
@@ -119,8 +119,8 @@
       }
 
       // Play through once
-      timeline.range(timeline.time(), end || timeline.duration()).loop(0);
-      return timeline.play(timeline.time());
+      timeline.range(skipTo || timeline.time(), end || timeline.duration()).loop(0);
+      return timeline.play(skipTo || timeline.time());
     };
 
     return next();

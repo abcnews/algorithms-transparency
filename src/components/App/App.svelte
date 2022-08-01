@@ -93,37 +93,21 @@
 		easing: cubicOut
 	});
 
-  const labelScale = tweened(1, {
-		duration: 1200,
-		easing: cubicOut
-	});
-  const labelOffset = tweened(0, {
-		duration: 1200,
-		easing: cubicOut
-	});
-  const xRotation = tweened(0, {
-		duration: 1200,
-		easing: cubicOut
-	});
-
   $: showScorecard = (frameMarker === '1' && !!sankeyScorecard) || (scrollytellerName === 'fourth' && frameMarker === '2');
   $: showScorecard ? yOffsetSankey.set(height * 0.3) : yOffsetSankey.set(0);
-  let timeoutRef: any;
-  $: {
-    if (scrollytellerName === 'fourth' && frameMarker === '2') {
-      timeoutRef = setTimeout(() => {
-        labelScale.set(0.3);
-        labelOffset.set(245);
-        xRotation.set(4);
-      }, 1500);
-    } else {
-      clearTimeout(timeoutRef);
-      labelScale.set(1);
-      labelOffset.set(0);
-      xRotation.set(0);
-    }
-  }
+  $: scorecardOnBox = scrollytellerName === 'fourth' && frameMarker === '2';
 
+  let scorecardScores = AUDIT_SCORECARD;
+  let smoothing = 0;
+  const onUpdateCounts = () => {
+    if ((smoothing++) % 10 === 0) {
+      scorecardScores = AUDIT_SCORECARD.map(({ label, p1, p2 }) => ({
+        label,
+        p1: Math.round(p1 + Math.random() * 1.2),
+        p2: Math.round(p2 + Math.random() * 1.2),
+      }));
+    }
+  };
 </script>
 
 <!-- We only want 1 of these -->
@@ -148,7 +132,6 @@
     class="graphic"
     style="
       --x-offset: -{xOffset}px;
-      perspective: 250px;
     "
   >
     {#if isSankeyFrame(scrollytellerName, frameMarker)}
@@ -158,6 +141,7 @@
         width={simWidth}
         height={height}
         yOffset={$yOffsetSankey}
+        {onUpdateCounts}
       />
     {:else}
       {#if isDarkBackground && scrollytellerName === 'second'}
@@ -179,15 +163,17 @@
           width: {height}px;
           height: {height}px;
           padding-top: {200}px;
-          transform:
-            translate(var(--x-offset), -50%)
-            scale({$labelScale})
-            rotateX(-{$xRotation}deg)
-            translateY(-{$labelOffset}px)
+          perspective: 250px;
           ;
         "
       >
-        <Scorecard width={simWidth * 0.83} height={280} scores={AUDIT_SCORECARD} state={sankeyState} />
+        <Scorecard
+          width={simWidth * 0.83}
+          height={280}
+          scores={scorecardScores}
+          state={sankeyState}
+          isOutsideBox={scorecardOnBox}
+        />
       </div>
     {/if}
 

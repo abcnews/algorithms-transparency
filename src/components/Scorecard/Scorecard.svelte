@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { cubicOut } from 'svelte/easing';
+  import { tweened } from 'svelte/motion';
   import Particle from '../Sankey/Particle.svelte';
   import { RED, BLUE } from '../../constants';
 
@@ -12,6 +14,7 @@
   export let state: string;
   // export let height: number;
   export let width: number;
+  export let isOutsideBox = false;
 
   const grade = (score: Score) => {
     const diff = Math.abs(score.p2 - score.p1) 
@@ -23,12 +26,46 @@
     }
     return 'D';
   };
+
+  const labelScale = tweened(1, {
+		duration: 1200,
+		easing: cubicOut
+	});
+  const labelOffset = tweened(0, {
+		duration: 1200,
+		easing: cubicOut
+	});
+  const xRotation = tweened(0, {
+		duration: 1200,
+		easing: cubicOut
+	});
+
+  let timeoutRef: any;
+  $: {
+    if (isOutsideBox) {
+      timeoutRef = setTimeout(() => {
+        labelScale.set(0.35);
+        labelOffset.set(25);
+        xRotation.set(4);
+      }, 2500);
+    } else {
+      clearTimeout(timeoutRef);
+      labelScale.set(1);
+      labelOffset.set(0);
+      xRotation.set(0);
+    }
+  }
+
 </script>
 
 <div
   class="sankey-scorecard"
   style="
     width: {width}px;
+    transform:
+      scale({$labelScale})
+      rotateX(-{$xRotation}deg)
+      translateY(-{$labelOffset}px);
   "
 >
   <div class="row">
@@ -176,6 +213,7 @@
         }
         .bar-inner {
           height: 13px;
+          transition: width 400ms ease-out;
         }
       }
 
