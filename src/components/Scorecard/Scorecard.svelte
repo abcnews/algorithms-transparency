@@ -44,8 +44,8 @@
   $: {
     if (isOutsideBox) {
       timeoutRef = setTimeout(() => {
-        labelScale.set(0.38);
-        labelOffset.set(60);
+        labelScale.set(0.45);
+        labelOffset.set(50);
         xRotation.set(4);
       }, 2500);
     } else {
