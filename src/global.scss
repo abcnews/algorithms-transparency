@@ -66,28 +66,8 @@
     }
   }
 
-  /* size and position the visuals based on the viewport height */
-  .graphic > .scorecard-wrapper,
-  .graphic > svg {
-    /* https://jonathannicol.com/blog/2014/06/16/centre-crop-thumbnails-with-css/ */
-    position: absolute;
-    left: 50%;
-    top: 50%;
-
-    /* We want to force 1:1 ratio, and lose the sides */
-    width: 100vh;
-    height: 100vh;
-    transform: translate(var(--x-offset), -50%);
-    max-width: 5000vw;
-  }
-
   /* Move the graphic to the left and the text to the right on desktop */
   @media (min-width: 76rem) {
-    .graphic > .scorecard-wrapper,
-    .graphic > svg {
-      transform: translate(-50vw, -50%);
-    }
-
     .scrollyteller .st-panel,
     .scrollyteller .panel {
       margin-left: 55vw !important;

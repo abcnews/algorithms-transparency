@@ -90,7 +90,7 @@
       height={22}
       width={24}
       style="
-        transform: translateX(calc(-31% - {showGrades ? 40 : 0}px));
+        transform: translateX(calc(-31% - {showGrades ? 36 : 0}px));
         transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1)
       "
     >

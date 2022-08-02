@@ -160,7 +160,7 @@
         style="
           width: {height}px;
           height: {height}px;
-          padding-top: {height * .25}px;
+          padding-top: {height * .25 + 40}px;
           perspective: 250px;
         "
       >
@@ -178,6 +178,32 @@
 </Scrollyteller>
 
 <style lang="scss">
+  /* size and position the visuals based on the viewport height */
+  .graphic > :global(svg),
+  .scorecard-wrapper {
+    position: absolute;
+    z-index: 999999;
+
+    /* We want to force 1:1 ratio, and crop the sides on narrow screens (mainly mobile) */
+    height: 100vh;
+    width: 100vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(var(--x-offset), -50%);
+    /* transform: translate(-50vw, -50%); */
+  }
+
+  /* Move the graphic to the left and the text to the right on desktop */
+  @media (min-width: 76rem) {
+    .graphic > :global(svg),
+    .scorecard-wrapper {
+      transform: translate(-50vw, -50%);
+    }
+    .locator {
+      transform: translate(calc(-25vw - 50%), calc(-25vh + 0px)) !important;
+    }
+  }
+
   .graphic {
     position: relative;
     height: 100vh;
