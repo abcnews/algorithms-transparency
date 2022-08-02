@@ -16,8 +16,7 @@ const SCROLLYTELLERS = [
   'first',
   'second',
   'third',
-  'fourth',
-  'fifth',
+  'fourth'
 ];
 
 let scrollytellerComponents: any[] = [];

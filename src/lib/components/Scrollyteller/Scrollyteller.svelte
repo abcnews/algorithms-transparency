@@ -154,6 +154,7 @@
 
 	.graphic {
 		transform: translate3d(0, 0, 0);
+    overflow: hidden;
 		height: calc(var(--vh, 1vh) * 100);
 		width: 100%;
 		position: sticky;
