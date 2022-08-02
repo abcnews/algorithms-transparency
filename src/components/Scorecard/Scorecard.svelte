@@ -69,14 +69,14 @@
       translateY(-{$labelOffset}px);
   "
 >
-  <div class="row">
+  <div class="row title-header">
     <h6>VISA REFUSALS</h6>
   </div>
-  <div class="row">
+  <div class="row particle-header">
     <svg
       height={22}
       width={22}
-      style="transform: translateX(15%);"
+      style="transform: translateX(21%);"
     >
       <Particle
         size={8}
@@ -90,7 +90,7 @@
       height={22}
       width={24}
       style="
-        transform: translateX(calc(-15% - {showGrades ? 45 : 0}px));
+        transform: translateX(calc(-31% - {showGrades ? 40 : 0}px));
         transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1)
       "
     >
@@ -104,48 +104,53 @@
   </div>
 
   {#each scores as score}
-    <span class="title">{score.label}</span>
-      <div class="row">
-        <span
-          class="score"
-          style="
-            color: {BLUE.colour} !important;
-            transform: translateX(15%);
-          "
-        >
-          {score.p1}%
-        </span>
-        <div class="bar-wrapper">
-          <div class="bar">
-            <div
-              class="bar-inner"
-              style="background: {BLUE.colour}; width: {100 * score.p1 / 50}%; margin-left: auto;"
-            />
-          </div>
-          <div class="middle-line" />
+    <span
+      class="title"
+      style="transform: translateX(-{showGrades ? 20 : 0}px);"
+    >
+      {score.label}
+    </span>
+    <div class="row">
+      <span
+        class="score"
+        style="
+          color: {BLUE.colour} !important;
+          transform: translateX(15%);
+        "
+      >
+        {score.p1}%
+      </span>
+      <div class="bar-wrapper">
+        <div class="bar">
+          <div
+            class="bar-inner"
+            style="background: {BLUE.colour}; width: {100 * score.p1 / 50}%; margin-left: auto;"
+          />
+        </div>
+        <div class="middle-line" />
 
-          <div class="bar">
-            <div
-              class="bar-inner"
-              style="background: {RED.colour}; width: {100 * score.p2 / 50}%"
-            />
+        <div class="bar">
+          <div
+            class="bar-inner"
+            style="background: {RED.colour}; width: {100 * score.p2 / 50}%"
+          />
+        </div>
+      </div>
+      <span
+        class="score"
+        style="
+          color: {RED.colour} !important;
+          transform: translateX(-15%);
+        "
+      >
+        {score.p2}%
+      </span>
+        <div class="grade" style="width: {showGrades ? 60 : 0.00001}px;">
+          <div style="opacity: {showGrades ? 1 : 0}">
+            {grade(score)}
           </div>
         </div>
-        <span
-          class="score"
-          style="
-            color: {RED.colour} !important;
-            transform: translateX(-15%);
-          "
-        >
-          {score.p2}%
-        </span>
-          <div class="grade" style="width: {showGrades ? 60 : 0.00001}px;">
-            <div style="opacity: {showGrades ? 1 : 0}">
-              {grade(score)}
-            </div>
-          </div>
-      </div>
+    </div>
   {/each}
 </div>
 
@@ -159,25 +164,38 @@
     align-items: center;
 
     padding: 1rem;
-    background: black;
+    background: #110817;
     color: white;
 
     :global(h6) {
-      font-size: 1rem;
+      font-size: 0.9rem;
       margin: auto;
       margin-bottom: 0.5rem;
     }
 
+    .title-header {
+      height: 10px;
+    }
+
+    .particle-header {
+      height: 15px;
+    }
+
     .title {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
       width: 100px;
       text-align: center;
-      transform: translateY(2px);
+      /* transform: translateY(2px); */
+      transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1);
     }
 
     .grade {
       font-size: 0.9rem;
       text-align: center;
+      height: 1rem;
+      padding-left: 2px;
+      margin-top: -5px;
 
       div {
         width: inherit;
@@ -186,6 +204,7 @@
         color: black;
         margin: auto;
         width: 25px;
+        line-height: 25px;
       }
     }
 
@@ -194,7 +213,8 @@
       justify-content: space-between;
       width: 100%;
 
-      font-weight: 900;
+      /* font-weight: 900; */
+      line-height: 1rem;
 
       /* Animate adding the grades */
       & > * {
@@ -215,16 +235,16 @@
         .middle-line {
           width: 2px;
           background: white;
-          height: 17px;
+          height: 10px;
           transform: translateY(-2px);
         }
 
         .bar {
           width: 100%;
-          height: 13px;
+          height: 6px;
         }
         .bar-inner {
-          height: 13px;
+          height: 6px;
           transition: width 400ms ease-out;
         }
       }
