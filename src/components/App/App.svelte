@@ -190,7 +190,6 @@
     top: 50%;
     left: 50%;
     transform: translate(var(--x-offset), -50%);
-    /* transform: translate(-50vw, -50%); */
   }
 
   /* Move the graphic to the left and the text to the right on desktop */
@@ -198,9 +197,6 @@
     .graphic > :global(svg),
     .scorecard-wrapper {
       transform: translate(-50vw, -50%);
-    }
-    .locator {
-      transform: translate(calc(-25vw - 50%), calc(-25vh + 0px)) !important;
     }
   }
 

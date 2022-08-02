@@ -23,11 +23,19 @@
         color: var(--link-colour-visited) !important;
       }
     }
+
+    /* Override --link-colour for image gallery */
+    .Gallery-pane a {
+      color: currentColor !important;
+    }
   }
 
-  /* Other content should go above the scrollyteller scrollout divs and the noise div */
+  /* Other content should go above the scrollyteller scrollout divs and the noise layer */
   .Main.u-layout > h2,
   .Main.u-layout > ul,
+  .Main.u-layout > p,
+  div[data-component="NewsFooter"],
+  .Header,
   header {
     z-index: 5;
     position: relative;
@@ -104,12 +112,6 @@
     .st-panel:last-of-type {
       margin-bottom: 100vh;
     }
-  }
-
-  .Header,
-  .Main.u-layout > p {
-    z-index: 100;
-    position: relative;
   }
 
   .Header {
