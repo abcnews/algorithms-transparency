@@ -57,6 +57,7 @@
   }
 
   $: showGrades = state !== 'running';
+  $: particleShift = width ? width * 0.07 : 10;
 </script>
 
 <div
@@ -72,32 +73,36 @@
   <div class="row title-header">
     <h6>VISA REFUSALS</h6>
   </div>
-  <div class="row particle-header">
+  <div
+    class="row particle-header"
+      style="
+        transform: translateX(-{showGrades ? 20 : 0}px);
+      "
+  >
     <svg
-      height={22}
-      width={22}
-      style="transform: translateX(21%);"
+      height={18}
+      width={18}
+      style="transform: translateX({particleShift}px);"
     >
       <Particle
-        size={8}
-        x={11}
-        y={11}
+        size={7}
+        x={9}
+        y={9}
         colour={BLUE.colour}
       />
     </svg>
 
     <svg
-      height={22}
-      width={24}
+      height={18}
+      width={20}
       style="
-        transform: translateX(calc(-31% - {showGrades ? 36 : 0}px));
-        transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1)
+      transform: translateX(-{particleShift}px);
       "
     >
       <Particle
-        size={8}
-        x={10}
-        y={11}
+        size={7}
+        x={9}
+        y={10}
         colour={RED.colour}
       />
     </svg>
@@ -106,11 +111,21 @@
   {#each scores as score}
     <span
       class="title"
-      style="transform: translateX(-{showGrades ? 20 : 0}px);"
+      style="
+        transform: translateX(-{showGrades ? 20 : 0}px);
+      "
     >
       {score.label}
     </span>
-    <div class="row">
+
+    <div
+      class="row"
+      style="
+        transform: translateX(-{showGrades ? 20 : 0}px);
+        width: {width - 66}px;
+        position: relative;
+      "
+    >
       <span
         class="score"
         style="
@@ -145,11 +160,11 @@
       >
         {score.p2}%
       </span>
-        <div class="grade" style="width: {showGrades ? 60 : 0.00001}px;">
-          <div style="opacity: {showGrades ? 1 : 0}">
-            {grade(score)}
-          </div>
+      <div class="grade" style="width: 60px;">
+        <div style="opacity: {showGrades ? 1 : 0}">
+          {grade(score)}
         </div>
+      </div>
     </div>
   {/each}
 </div>
@@ -166,6 +181,7 @@
     padding: 1rem;
     background: #110817;
     color: white;
+    transition: width 500ms cubic-bezier(0.22, 0.61, 0.36, 1);
 
     :global(h6) {
       font-size: 0.9rem;
@@ -174,11 +190,12 @@
     }
 
     .title-header {
-      height: 10px;
+      height: 20px;
     }
 
     .particle-header {
       height: 15px;
+      transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1)
     }
 
     .title {
@@ -186,7 +203,10 @@
       font-weight: 600;
       width: 100px;
       text-align: center;
-      /* transform: translateY(2px); */
+    }
+
+    .title,
+    .row {
       transition: transform 500ms cubic-bezier(0.22, 0.61, 0.36, 1);
     }
 
@@ -194,8 +214,10 @@
       font-size: 0.9rem;
       text-align: center;
       height: 1rem;
-      padding-left: 2px;
       margin-top: -5px;
+
+      position: absolute;
+      right: -55px;
 
       div {
         width: inherit;

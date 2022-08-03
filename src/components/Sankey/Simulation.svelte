@@ -38,6 +38,9 @@
 
       if (p.data.state === 'finished') {
         const scorecard = document.createElement('div');
+        // Stop the scorecard getting streched when in embedded in panels on wide screens
+        scorecard.style['max-width'] = '650px';
+        scorecard.style['margin'] = 'auto';
         p.nodes.push(scorecard);
 
         const scores = range(2015, p.data.year + 1).map(y => {
