@@ -1,4 +1,4 @@
-import { LINE_CHART_COLOURS } from '../../constants';
+import { LINE_CHART_COLOURS } from '../../../constants';
 
 export const data = [
   {

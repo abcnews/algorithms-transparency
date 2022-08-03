@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { loadGoogleDocAsScrollyTeller } from '../loadGoogleDocScrollyTeller';
-  import App from './App/App.svelte';
-
-  const URL_LOCALSTORAGE_KEY = 'algo-google-doc-url';
+  import { loadGoogleDocAsScrollyTeller } from './loadGoogleDocScrollyTeller';
+  const URL_LOCALSTORAGE_KEY = 'google-doc-url';
 
   let googleDocUrl = localStorage.getItem(URL_LOCALSTORAGE_KEY) || '';
 
@@ -49,7 +47,7 @@
   {/each}
 
   <div class="u-full">
-    <App scrollyData={scrollyData} name={name} />
+    <slot {scrollyData} panelName={name} />
   </div>
 {:else}
     <p class="FormatCredit">

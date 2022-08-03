@@ -10,12 +10,9 @@ const getLoaderDefinition = (config, testSourceMatch, loaderMatch) =>
 module.exports = {
   type: 'svelte',
   build: {
-    // extractCSS: true,
     includedDependencies,
     entry: [
-      "index",
-      "svg-iframe-controller",
-      "googledoc"
+      "index"
     ],
   },
   webpack: config => {
