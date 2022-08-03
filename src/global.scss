@@ -41,6 +41,10 @@
     position: relative;
   }
 
+  .MasterGallery {
+    z-index: 10 !important;
+  }
+
   .FormatCredit {
     z-index: 5;
     position: relative;
