@@ -2,17 +2,15 @@ import { calcDist } from './lib/calc';
 
 export const HISTORICAL_REJECTION_RATES = [0.26, 0.33];
 
-// red
 export const RED = {
-  name: 'India',
+  name: 'RED',
   colour: '#FF645C',
   numberOfApplicants: 100,
   dist: calcDist(HISTORICAL_REJECTION_RATES[1], HISTORICAL_REJECTION_RATES[0]),
 }
 
-// blue
 export const BLUE = {
-  name: 'Australia',
+  name: 'BLUE',
   colour: '#7085FF',
   numberOfApplicants: 100,
   dist: calcDist(HISTORICAL_REJECTION_RATES[0], HISTORICAL_REJECTION_RATES[1]),
@@ -26,13 +24,6 @@ export const REJECTION_RATES = {
 };
 
 export const INITIAL_YEAR = 2015;
-
-export const LINE_CHART_COLOURS = {
-  Syria: '#00CAE8',
-  Australia: '#0092ED',
-  'United States': '#AFD6FD',
-  Nepal: '#FF571A',
-};
 
 export const PINK_BG = '#c5b8df';
 export const DARK_BG = '#1B1023';

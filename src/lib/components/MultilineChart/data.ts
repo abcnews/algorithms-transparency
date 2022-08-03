@@ -1,4 +1,8 @@
-import { LINE_CHART_COLOURS } from '../../../constants';
+const LINE_CHART_COLOURS = {
+  Australia: '#0092ED',
+  'United States': '#AFD6FD',
+  Nepal: '#FF571A',
+};
 
 export const data = [
   {
