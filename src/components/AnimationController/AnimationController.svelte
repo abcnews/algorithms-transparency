@@ -36,7 +36,11 @@
     return false;
   };
 
-  $: setAnimation(currentMarkerState, frameMarker);
+  $: {
+    if (!(scrollytellerName === 'first' && frameMarker === '1')) {
+      setAnimation(currentMarkerState, frameMarker);
+    }
+  }
   $: absolutePath = __webpack_public_path__ || '/';
 
   const setAnimation = (currentState: string | null, nextFrame: string | null) => {
@@ -85,6 +89,12 @@
     // trigger crossfade callback
     if (scrollytellerName === 'second' && nextFrame === '2') {
       timeoutRef = setTimeout(onTransitionToDark, 2750);
+    }
+
+    // wait for fade-in animation before animating the first frame
+    if (scrollytellerName === 'first' && nextFrame === '1') {
+      timeoutRef = setTimeout(() => animate([initialFrameNoLoop]), 750);
+      return;
     }
 
     // If scrolling up, pause at the end state

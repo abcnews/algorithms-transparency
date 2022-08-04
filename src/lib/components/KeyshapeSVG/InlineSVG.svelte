@@ -16,7 +16,7 @@
   export let spinnerColour: string | undefined;
   export let transformSrc = (svg) => svg
   let opacity = tweened(0, {
-    duration: 1500,
+    duration: 750,
     easing: cubicIn,
   });
 
