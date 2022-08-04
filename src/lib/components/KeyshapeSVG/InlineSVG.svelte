@@ -97,7 +97,34 @@
   xmlns="http://www.w3.org/2000/svg"
   class="keyshape-svg"
   bind:innerHTML={svgContent}
+  data-loaded={isLoaded ? 'true' : 'false'}
   {...svgAttrs}
   {...$$restProps}
   contenteditable
 />
+
+<style>
+  svg[data-loaded="false"] {
+    --size: 60px;
+    --color: #000;
+    --duration: 0.75s;
+
+    height: var(--size);
+    width: var(--size);
+    border-color: var(--color) transparent var(--color) var(--color);
+    border-width: calc(var(--size) / 15);
+    border-style: solid;
+    border-image: initial;
+    border-radius: 50%;
+    animation: var(--duration) linear 0s infinite normal none running rotate;
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
