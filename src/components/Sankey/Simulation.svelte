@@ -39,7 +39,7 @@
       if (p.data.state === 'finished') {
         const scorecard = document.createElement('div');
         // Stop the scorecard getting streched when in embedded in panels on wide screens
-        scorecard.style['max-width'] = '650px';
+        scorecard.style['max-width'] = '750px';
         scorecard.style['margin'] = 'auto';
         p.nodes.push(scorecard);
 

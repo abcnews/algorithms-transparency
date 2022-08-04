@@ -4,15 +4,21 @@
   //
 
   import { onMount, createEventDispatcher, tick } from 'svelte'
+  import { tweened } from 'svelte/motion';
+	import { cubicIn } from 'svelte/easing';
   import { get_current_component } from 'svelte/internal';
   import { forwardEventsBuilder } from './forwardEvents';
 
   const dispatch = createEventDispatcher()
   const forwardEvents = forwardEventsBuilder(get_current_component());
 
-  export let src
-  export let spinnerColour;
+  export let src: string;
+  export let spinnerColour: string | undefined;
   export let transformSrc = (svg) => svg
+  let opacity = tweened(0, {
+    duration: 1500,
+    easing: cubicIn,
+  });
 
   onMount(() => {
     inline(src)
@@ -82,6 +88,7 @@
         svgContent = svg.innerHTML
         // render svg element
         await tick()
+        opacity.set(1);
         isLoaded = true
         dispatch('loaded')
       })
@@ -102,7 +109,11 @@
   {...svgAttrs}
   {...$$restProps}
   contenteditable
-  style="--spinner-colour: {spinnerColour}"
+  style="
+    --spinner-colour: {spinnerColour};
+    opacity: {$opacity};
+  "
+
 />
 
 <style>

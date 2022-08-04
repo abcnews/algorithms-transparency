@@ -146,6 +146,20 @@ whenOdysseyLoaded.then(() => {
   addEventListener('scroll', () => checkBg());
 });
 
+const absolutePath = __webpack_public_path__ || '/';
+const preload = (assetSrc: string) => {
+  const preloadLink = document.createElement("link");
+  preloadLink.href = `${absolutePath}${assetSrc}`;
+  preloadLink.rel = "preload";
+  preloadLink.as = "image";
+  document.head.appendChild(preloadLink);
+};
+
+// Preload the shadow and noise assets so they're already cached when the inline SVG is added later on.
+preload('Shadow.png');
+preload('Noise.png');
+
 if (process.env.NODE_ENV === 'development') {
   console.debug(`[algorithms-transparency] public path: ${__webpack_public_path__}`);
 }
+

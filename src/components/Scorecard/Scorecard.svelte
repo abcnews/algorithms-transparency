@@ -12,7 +12,6 @@
 
   export let scores: Score[];
   export let state: string | null;
-  // export let height: number;
   export let width: number;
   export let isOutsideBox = false;
 
@@ -178,7 +177,7 @@
     flex-direction: column;
     align-items: center;
 
-    padding: 1rem;
+    padding: 1.5rem;
     background: #110817;
     color: white;
     transition: width 500ms cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -234,8 +233,6 @@
       display: flex;
       justify-content: space-between;
       width: 100%;
-
-      /* font-weight: 900; */
       line-height: 1rem;
 
       /* Animate adding the grades */
@@ -245,7 +242,7 @@
 
       .score {
         font-size: 0.9rem;
-        width: 30px;
+        width: 40px;
       }
 
       .bar-wrapper {

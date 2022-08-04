@@ -51,23 +51,6 @@ html[style*="scrollbar-width"] {
     color: white;
   }
 
-  .scrollyteller .st-panel p,
-  .scrollyteller .panel p {
-    color: var(--text-colour) !important;
-  }
-
-  /* Allow the panels to be coloured based on light vs dark background setting */
-  .scrollyteller .panel,
-  .scrollyteller .st-panel {
-    z-index: 3;
-
-    &::before {
-      background-color: var(--scrim-background-colour) !important;
-      opacity: var(--scrim-opacity);
-      box-shadow: none !important;
-    }
-  }
-
   .ImageEmbed.u-pull {
     color: var(--text-colour);
     position: relative;
@@ -101,23 +84,6 @@ html[style*="scrollbar-width"] {
     }
   }
 
-  /* 
-     The end of the first scrollyteller needs to land just on top of the title
-   */
-  #scrollytellerNAMEfirstFRAME1 {
-    margin-bottom: -43vh;
-
-    .panel:first-child,
-    .st-panel:first-child {
-      margin-top: 62vh;
-    }
-
-    .panel:last-of-type,
-    .st-panel:last-of-type {
-      margin-bottom: 100vh;
-    }
-  }
-
   .Header {
     background: linear-gradient(6deg, rgba(197,184,223,0.420045518207283) 100%, rgba(197,184,223,0.8981967787114846) 0%);
   }
@@ -133,4 +99,42 @@ html[style*="scrollbar-width"] {
     margin-right: 0.1rem;
   }
 
+  #scrollytellerNAMEfirstFRAME1 {
+    margin-bottom: -43vh;
+  }
+
 }
+
+/* 
+ * The end of the first scrollyteller needs to land just on top of the title
+ */
+#scrollytellerNAMEfirstFRAME1 {
+  .panel:first-child,
+  .st-panel:first-child {
+    margin-top: 62vh;
+  }
+
+  .panel:last-of-type,
+  .st-panel:last-of-type {
+    margin-bottom: 100vh;
+  }
+}
+
+
+.scrollyteller .st-panel p,
+.scrollyteller .panel p {
+  color: var(--text-colour) !important;
+}
+
+/* Allow the panels to be coloured based on light vs dark background setting */
+.scrollyteller .panel,
+.scrollyteller .st-panel {
+  z-index: 3;
+
+  &::before {
+    background-color: var(--scrim-background-colour) !important;
+    opacity: var(--scrim-opacity);
+    box-shadow: none !important;
+  }
+}
+
