@@ -11,6 +11,7 @@
   const forwardEvents = forwardEventsBuilder(get_current_component());
 
   export let src
+  export let spinnerColour;
   export let transformSrc = (svg) => svg
 
   onMount(() => {
@@ -95,23 +96,23 @@
 <svg
   use:forwardEvents
   xmlns="http://www.w3.org/2000/svg"
-  class="keyshape-svg"
+  class="keyshape-svg {spinnerColour ? 'spinner' : ''}"
   bind:innerHTML={svgContent}
   data-loaded={isLoaded ? 'true' : 'false'}
   {...svgAttrs}
   {...$$restProps}
   contenteditable
+  style="--spinner-colour: {spinnerColour}"
 />
 
 <style>
-  svg[data-loaded="false"] {
+  svg[data-loaded="false"].spinner {
     --size: 60px;
-    --color: #000;
     --duration: 0.75s;
 
     height: var(--size);
     width: var(--size);
-    border-color: var(--color) transparent var(--color) var(--color);
+    border-color: var(--spinner-colour) transparent var(--spinner-colour) var(--spinner-colour);
     border-width: calc(var(--size) / 15);
     border-style: solid;
     border-image: initial;

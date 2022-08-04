@@ -9,6 +9,7 @@
   // Callback for parent
   export let onLoad = () => null; 
   export let onFinishAnimation = (end: string) => end;
+  export let spinnerColour: string | undefined;
 
   const onLoadCb = () => {
     try {
@@ -130,5 +131,6 @@
 <InlineSVG
   src={`${path}?global=paused`}
   transformSrc={transform}
+  {spinnerColour}
   on:loaded={onLoadCb}
 />

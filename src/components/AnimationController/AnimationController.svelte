@@ -105,6 +105,7 @@
   path={`${absolutePath}${svgPath}`}
   bind:this={svgComponent}
   bind:timeline={timeline}
+  spinnerColour={''}
   onLoad={() => {
     setAnimation(null, frameMarker || '1');
     return null;
