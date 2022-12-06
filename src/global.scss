@@ -35,6 +35,8 @@ html[style*="scrollbar-width"] {
   .Main.u-layout > ul,
   .Main.u-layout > p,
   div[data-component="NewsFooter"],
+  div[data-component="Sidebar"],
+  div[data-component="BackToTop"],
   .Header,
   header {
     z-index: 5;
