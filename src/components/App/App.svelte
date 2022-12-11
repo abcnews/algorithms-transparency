@@ -200,6 +200,10 @@
     }
   }
 
+  :global(#scrollytellerNAMEfirstFRAME1) {
+    margin-bottom: -43vh;
+  }
+
   .graphic {
     position: relative;
     height: 100vh;
@@ -224,6 +228,10 @@
     width: 100vw;
     z-index: 50;
     transition: opacity 400ms ease-in;
+  }
+
+  :global([data-tag="startfallback"]) {
+    display: none !important;
   }
 
 </style>

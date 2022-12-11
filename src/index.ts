@@ -100,6 +100,12 @@ const isInsideBox = () => {
 };
 
 whenOdysseyLoaded.then(() => {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
+    console.log('falling back to low motion mode');
+    return;
+  }
+
   scrollytellerComponents = SCROLLYTELLERS.map((name, i) => {
     try {
       const scrollyData = loadScrollyteller(name, 'u-full', 'mark');
@@ -118,12 +124,6 @@ whenOdysseyLoaded.then(() => {
                 return;
               }
               root.style.setProperty('--background-colour', DARK_BG);
-              // root.style.setProperty('--noise-opacity', '0.12');
-              // root.style.setProperty('--scrim-opacity', '0.85');
-              // root.style.setProperty('--scrim-background-colour', DARK_SCRIM);
-              // root.style.setProperty('--text-colour', 'white');
-              // root.style.setProperty('--link-colour', '#6BB5FF');
-              // root.style.setProperty('--link-colour-visited', '#C0A3FF');
               setTimeout(setToDarkBackground, 100);
             },
             onTransitionToOutsideBox: () => {
@@ -131,9 +131,6 @@ whenOdysseyLoaded.then(() => {
                 return;
               }
               setToLightBackground();
-              // root.style.setProperty('--background-colour', PINK_BG);
-              // root.style.setProperty('--noise-opacity', '0.25');
-              // setTimeout(setToLightBackground, 50);
             },
           }
         });
